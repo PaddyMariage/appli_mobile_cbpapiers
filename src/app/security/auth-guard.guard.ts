@@ -15,7 +15,6 @@ export class AuthGuard implements CanActivate {
     async canActivate() {
         // todo peut etre a modifier dans le futur pour ne plus prendre en compte la longueur du storage<
         await this.storage.get('logged').then((logged:string) => {
-            console.log(logged);
             this.access = (logged != null);
         }).catch(() => {
             this.access = false;
