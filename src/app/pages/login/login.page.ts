@@ -4,7 +4,6 @@ import {ContactPageModule} from '../contact/contact.module';
 import {UserService} from 'src/app/services/user.service';
 import {Router, NavigationEnd} from '@angular/router';
 import {F_COMPTET} from '../../models/JSON/F_COMPTET';
-import {UserWeb} from "../../models/UserWeb";
 import {Storage} from "@ionic/storage";
 
 @Component({
@@ -14,28 +13,22 @@ import {Storage} from "@ionic/storage";
 })
 export class LoginPage implements OnInit {
 
-    // todo : comparer les données envoyé en front avec le back, ensuite récupérer un token avec les infos pour qu'on puisse afficher
-    // les infos dans certaines parties de l'application (genre la partie compte). Actuellement dans l'application, on utilise un service
-    // pour transférer les données d'un client sur les différentes page.
-
     login: string;
     password: string;
     error: string;
-    userWeb : UserWeb;
-    usersWeb : UserWeb[] = [];
 
     constructor(private navCtrl: NavController,
                 private modalController: ModalController,
                 private userService: UserService,
                 private router: Router,
-                private platForm : Platform) {
+                private platForm : Platform,
+                private storage: Storage) {
 
                     this.platForm.ready().then(() => {
                         // J'attribue directement la taille du storage ici
                         this.userService.setAllUsersStorage().then((val : number) => {
                             this.redirection(val);
                             console.log("le tableau vaut .. " + val);
-
                         });
                         
                     });
@@ -53,20 +46,6 @@ export class LoginPage implements OnInit {
     ngOnInit() {
         
     }
-     /*
-    redirection() {
-        this.dataStorage.ready().then(() => {
-            if (this.userService.sizeStorage == 1) {
-                console.log("4 c'est pas vide!");
-                this.router.navigateByUrl('/nav/article');
-            } else if (this.userService.sizeStorage> 1) {
-                this.router.navigateByUrl('/acc-choice');
-            } else {
-                console.log("4 c'est vide :'(, storage vaut " + this.userService.sizeStorage);
-            }
-        });
-    }
-    */
 
     redirection(val : number) {
         if (val == 1) {
@@ -80,8 +59,9 @@ export class LoginPage implements OnInit {
         }
     }
 
-    async initClient() {
-        // on créer le compte
+
+    // permet d'ajouter le client et d'aller aux articles. Async obligatoire sous peine d'erreur
+    addCustomerAndGoToArticle() {
         const compte: F_COMPTET =
             {
                 CT_Num: "ADRANO",
@@ -94,18 +74,14 @@ export class LoginPage implements OnInit {
                 CT_Telephone: "06 01 03 10 07",
                 CT_EMail: "contact@adranopizz.fr"
             };
-        
+
         // on ne va pas utiliser de set mais un systeme d'ajout/suppresion de compte. Ici, il est ajouté
         this.userService.addCustomer(compte);
-    }
-
-    // permet d'ajouter le client et d'aller aux articles. Async obligatoire sous peine d'erreur
-    async addCustomerAndGoToArticle() {
-        this.initClient();
+        this.storage.set('logged','logged');
         this.navCtrl.navigateForward(['/nav/article']);
     }
 
-    async goToAdministration() {
+    goToAdministration() {
         this.navCtrl.navigateForward(['administration']);
     }
 
@@ -130,8 +106,7 @@ export class LoginPage implements OnInit {
             this.error = 'Veuillez entrer un mot de passe';
         else {
             await this.userService.getUserValidity(this.login, this.password).then((data) => {
-                console.log(data);
-                console.log("win");
+                this.storage.set('logged','logged');
                 this.navCtrl.navigateForward(['/nav/article']);
             }).catch((data) => {
                     this.error = data;

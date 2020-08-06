@@ -6,18 +6,30 @@ import {Storage} from "@ionic/storage";
     providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-    access:boolean;
+    access: boolean;
+
     constructor(private router: Router,
-                private storage : Storage) {
+                private storage: Storage) {
     }
 
     async canActivate() {
-        // todo changer pour verifier
-        await this.storage.get('VICPIZZA').then(() => {this.access = true}).catch(()=> { this.access = false; }) == null
-        if(this.access == false){
-            this.router.navigateByUrl('/login');
-            return false;
-        }else
-        return this.access;
+        // todo peut etre a modifier dans le futur pour ne plus prendre en compte la longueur du storage<
+        await this.storage.get('logged').then((logged:string) => {
+            console.log(logged);
+            this.access = (logged != null);
+        }).catch(() => {
+            this.access = false;
+        })
+
+        await this.storage.length().then((length) => {
+            if(length == 0)
+                this.access = false;
+            }
+        )
+        if (this.access == false) {
+            await this.router.navigateByUrl('/login');
+            return this.access;
+        } else
+            return this.access;
     }
 }

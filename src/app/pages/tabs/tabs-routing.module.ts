@@ -23,7 +23,7 @@ const routes: Routes = [
                 redirectTo:'/nav/article',
                 pathMatch:'full'
             }
-        ]
+        ],
     },
     {
         path:'',

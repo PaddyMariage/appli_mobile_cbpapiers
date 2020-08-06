@@ -101,8 +101,8 @@ export class UserService {
         // On attend que le storage prêt
         this.dataStorage.ready().then(() => {
             // systéme de clé / valeur
-            this.dataStorage.set(user.CT_Num, user);  
-            }).then(() => 
+            this.dataStorage.set(user.CT_Num, user);
+        }).then(() =>
             this.getUserStorage(user.CT_Num));
     }
 
@@ -116,7 +116,7 @@ export class UserService {
         });
     }
 
-    setAllUsersStorage() : Promise<number>{
+    setAllUsersStorage(): Promise<number> {
         // les 3 returns sont obligatoires pour que la méthode fonctionne
         return this.dataStorage.ready().then(() => {
             this.customerAccounts = [];
@@ -132,13 +132,10 @@ export class UserService {
         })
     }
 
-    getStorageLength() : Promise<number> {
-            this.sizeStorage = 0;
-            // this.dataStorage.clear().then(() => {
-                 return this.dataStorage.length().then((val : number) => 
-                    this.sizeStorage = val);
-            // });
-
+    getStorageLength(): Promise<number> {
+        this.sizeStorage = 0;
+        return this.dataStorage.length().then((val: number) =>
+            this.sizeStorage = val);
     }
 
     /**

@@ -27,6 +27,7 @@ export class DeleteAccPage implements OnInit {
     }
 
     // todo recup ce qui a ete fait dans login pour la logique
+    // et virer 'logged' du storage si plus de comptes
    /* deleteAcc() {
         // recupere un msg d'erreur si invalid, sinon un account
         let res = this.userService.getUserValidity(this.customer.name,this.password);
