@@ -124,6 +124,8 @@ export class UserService {
                 this.customerAccounts.push(valeur);
                 console.log(valeur.CT_Num + " ajouté a customerAccounts");
             }).then(() => this.getStorageLength().then((val) => {
+                this.customerAccounts$.next(this.customerAccounts);
+                this.activeCustomer$.next(this.customerAccounts[0]);
                 console.log("val dans setAll vaut " + val);
                 return val;
             }));

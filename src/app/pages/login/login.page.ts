@@ -22,7 +22,6 @@ export class LoginPage implements OnInit {
     password: string;
     error: string;
     userWeb : UserWeb;
-    arraySize : number;
     usersWeb : UserWeb[] = [];
 
     constructor(private navCtrl: NavController,
@@ -34,8 +33,9 @@ export class LoginPage implements OnInit {
                     this.platForm.ready().then(() => {
                         // J'attribue directement la taille du storage ici
                         this.userService.setAllUsersStorage().then((val : number) => {
-                            this.arraySize = val;
-                            console.log("le tableau vaut .. " + this.arraySize);
+                            this.redirection(val);
+                            console.log("le tableau vaut .. " + val);
+
                         });
                         
                     });
@@ -51,7 +51,7 @@ export class LoginPage implements OnInit {
 
 
     ngOnInit() {
-
+        
     }
      /*
     redirection() {
@@ -67,6 +67,18 @@ export class LoginPage implements OnInit {
         });
     }
     */
+
+    redirection(val : number) {
+        if (val == 1) {
+            console.log("Redirection vers article car 1");
+            this.router.navigateByUrl('/nav/article');
+        } else if (val > 1) {
+            console.log("Redirection vers acc choice");
+            this.router.navigateByUrl('/acc-choice');
+        } else {
+            console.log("C'est vide :'(");
+        }
+    }
 
     async initClient() {
         // on créer le compte
