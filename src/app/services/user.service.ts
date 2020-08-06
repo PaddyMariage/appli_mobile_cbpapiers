@@ -18,8 +18,8 @@ export class UserService {
     public customerAccounts$: BehaviorSubject<F_COMPTET[]> = new BehaviorSubject<F_COMPTET[]>([]);
 
     constructor(private http: HttpClient, private dataStorage: Storage) {
-    }
 
+    }
 
     // récupère le compte actif
     getActiveCustomer() {
@@ -101,10 +101,9 @@ export class UserService {
         // On attend que le storage prêt
         this.dataStorage.ready().then(() => {
             // systéme de clé / valeur
-            this.dataStorage.set(user.CT_Num, user);
-            this.getUserStorage(user.CT_Num);
-        });
-
+            this.dataStorage.set(user.CT_Num, user);  
+            }).then(() => 
+            this.getUserStorage(user.CT_Num));
     }
 
     getUserStorage(login: string) {
@@ -112,39 +111,32 @@ export class UserService {
             // systéme de promesse
             this.dataStorage.get(login).then((data: F_COMPTET) => {
                 console.log("J'ai mon user " + data.CT_Num + " dans le storage");
-                console.log(this.getStorageLength());
                 return data;
             });
         });
     }
 
-    setAllUsersStorage() {
-        this.customerAccounts = [];
-        this.dataStorage.ready().then(() => {
-            this.dataStorage.forEach((valeur: F_COMPTET) => {
+    setAllUsersStorage() : Promise<number>{
+        // les 3 returns sont obligatoires pour que la méthode fonctionne
+        return this.dataStorage.ready().then(() => {
+            this.customerAccounts = [];
+            return this.dataStorage.forEach((valeur: F_COMPTET) => {
                 this.customerAccounts.push(valeur);
-                console.log("3 " + valeur.CT_Num + " ajouté a customerAccounts");
-            });
+                console.log(valeur.CT_Num + " ajouté a customerAccounts");
+            }).then(() => this.getStorageLength().then((val) => {
+                console.log("val dans setAll vaut " + val);
+                return val;
+            }));
         })
     }
 
-    getStorageLength() {
-        this.dataStorage.length().then((total) => {
-            setTimeout(() => {
-                return total;
-            }, 100)
-        });
-        /*
-        return this.dataStorage.ready().then(() => {
+    getStorageLength() : Promise<number> {
             this.sizeStorage = 0;
             // this.dataStorage.clear().then(() => {
-                this.dataStorage.length().then((val : number) => {
-                    this.sizeStorage = val;
-                    console.log(" 2 Size storage vaut " + this.sizeStorage);
-                });
+                 return this.dataStorage.length().then((val : number) => 
+                    this.sizeStorage = val);
             // });
-            });
-         */
+
     }
 
     /**

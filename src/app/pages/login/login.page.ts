@@ -22,6 +22,7 @@ export class LoginPage implements OnInit {
     password: string;
     error: string;
     userWeb : UserWeb;
+    arraySize : number;
     usersWeb : UserWeb[] = [];
 
     constructor(private navCtrl: NavController,
@@ -31,8 +32,12 @@ export class LoginPage implements OnInit {
                 private platForm : Platform) {
 
                     this.platForm.ready().then(() => {
-                        this.userService.setAllUsersStorage();
-                        this.userService.getStorageLength();
+                        // J'attribue directement la taille du storage ici
+                        this.userService.setAllUsersStorage().then((val : number) => {
+                            this.arraySize = val;
+                            console.log("le tableau vaut .. " + this.arraySize);
+                        });
+                        
                     });
                     // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
                     // la méthode. Si l'url est similaire a la page de login et si c'est vide, redirige vers la liste

@@ -1,13 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {ModalController} from '@ionic/angular';
 import {SingleArticlePage} from '../single-article/single-article.page';
-import {Article} from 'src/app/models/Article';
 import {OrderLine} from 'src/app/models/OrderLine';
 import {UserService} from 'src/app/services/user.service';
 import {CartService} from '../../services/cart.service';
 import {ArticleService} from '../../services/article.service';
-import {cloneDeep} from 'lodash';
-import {F_ARTICLE} from "../../models/JSON/F_ARTICLE";
 import {Order} from "../../models/Order";
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
 
@@ -50,8 +47,8 @@ export class ArticlePage implements OnInit {
             }
         );
 
-        console.log(this.userService.getStorageLength());
-        // this.userService.setAllUsersStorage();
+        // this.userService.getStorageLength();
+        this.userService.setAllUsersStorage();
     }
 
     initTopF_ARTICLE() {
@@ -142,20 +139,20 @@ export class ArticlePage implements OnInit {
 
                             if (orderline.article.AC_PrixVen != 0 && orderline.article.AC_Remise != 0)
                                 orderline.article.unitPrice =
-                                    Math.ceil(orderline.article.AC_PrixVen * (1 - orderline.article.AC_Remise / 100)*100)/100;
+                                    orderline.article.AC_PrixVen * (1 - orderline.article.AC_Remise / 100);
 
                             else if (orderline.article.AC_PrixVen != 0 && orderline.article.AC_Remise == 0)
                                 orderline.article.unitPrice =
-                                    Math.ceil(orderline.article.AC_PrixVen*100)/100;
+                                    orderline.article.AC_PrixVen;
 
                             else if (orderline.article.AC_PrixVen == 0 && orderline.article.AC_Remise != 0)
                                 orderline.article.unitPrice =
-                                    Math.ceil(parseFloat(article.AR_PrixVen.replace(',', '.'))
-                                    * (1 - orderline.article.AC_Remise / 100)*100)/100;
+                                    parseFloat(article.AR_PrixVen.replace(',', '.'))
+                                    * (1 - orderline.article.AC_Remise / 100);
 
                             else
                                 orderline.article.unitPrice =
-                                    Math.ceil(parseFloat(article.AR_PrixVen.replace(',', '.'))*100)/100;
+                                    parseFloat(article.AR_PrixVen.replace(',', '.'));
 
 
             },
