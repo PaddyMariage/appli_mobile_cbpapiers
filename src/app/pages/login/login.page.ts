@@ -25,12 +25,18 @@ export class LoginPage implements OnInit {
                 private storage: Storage) {
 
                     this.platForm.ready().then(() => {
-                        // J'attribue directement la taille du storage ici
+
+                        // Laissez cette méthode, elle sert a clean le stockage et a tester
+                        // this.storage.clear().then(() => {
+                            // J'attribue directement la taille du storage ici
                         this.userService.setAllUsersStorage().then((val : number) => {
-                            this.redirection(val);
-                            console.log("le tableau vaut .. " + val);
-                        });
-                        
+                            this.userService.getUserLoggedStorage().then(() => {
+                                this.redirection(val);
+                                console.log("le tableau vaut .. " + val);
+                            })
+                            
+                        // });
+                      }); 
                     });
                     // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
                     // la méthode. Si l'url est similaire a la page de login et si c'est vide, redirige vers la liste
@@ -106,7 +112,7 @@ export class LoginPage implements OnInit {
             this.error = 'Veuillez entrer un mot de passe';
         else {
             await this.userService.getUserValidity(this.login, this.password).then((data) => {
-                this.storage.set('logged','logged');
+                // this.storage.set('logged','logged');
                 this.navCtrl.navigateForward(['/nav/article']);
             }).catch((data) => {
                     this.error = data;

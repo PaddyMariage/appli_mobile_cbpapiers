@@ -31,7 +31,9 @@ export class UserService {
     setActiveCustomer(f_comptet: F_COMPTET) {
         this.activeCustomer = f_comptet;
         this.activeCustomer$.next(this.activeCustomer);
-        localStorage.setItem('user', JSON.stringify(this.activeCustomer));
+        this.dataStorage.ready().then(() => {
+            this.dataStorage.set('logged', this.activeCustomer);
+        });
     }
 
 
@@ -86,7 +88,6 @@ export class UserService {
                     if (found) {
                         this.setActiveCustomer(F_Comptet);
                         this.addCustomer(F_Comptet);
-                        this.setUserStorage(F_Comptet);
                         this.getStorageLength();
                         resolve(F_Comptet);
                     } else {
@@ -116,6 +117,17 @@ export class UserService {
         });
     }
 
+    async getUserLoggedStorage() {
+        await this.dataStorage.ready().then(() => {
+            this.dataStorage.get('logged').then((data : F_COMPTET) => {
+                if (data) {
+                    this.activeCustomer = data;
+                    this.activeCustomer$.next(this.activeCustomer);
+                }
+            })
+        })
+    }
+
     setAllUsersStorage(): Promise<number> {
         // les 3 returns sont obligatoires pour que la méthode fonctionne
         return this.dataStorage.ready().then(() => {
@@ -125,7 +137,6 @@ export class UserService {
                 console.log(valeur.CT_Num + " ajouté a customerAccounts");
             }).then(() => this.getStorageLength().then((val) => {
                 this.customerAccounts$.next(this.customerAccounts);
-                this.activeCustomer$.next(this.customerAccounts[0]);
                 console.log("val dans setAll vaut " + val);
                 return val;
             }));
