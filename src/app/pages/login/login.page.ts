@@ -30,13 +30,10 @@ export class LoginPage implements OnInit {
                         // this.storage.clear().then(() => {
                             // J'attribue directement la taille du storage ici
                         this.userService.setAllUsersStorage().then((val : number) => {
-                            this.userService.getUserLoggedStorage().then(() => {
-                                this.redirection(val);
-                                console.log("le tableau vaut .. " + val);
-                            })
-                            
-                        // });
-                      }); 
+                            this.redirection(val);
+                            console.log("longueur du tableau : " + val);
+                        });
+                        
                     });
                     // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
                     // la méthode. Si l'url est similaire a la page de login et si c'est vide, redirige vers la liste
@@ -50,7 +47,7 @@ export class LoginPage implements OnInit {
 
 
     ngOnInit() {
-        
+        //this.storage.clear();
     }
 
     redirection(val : number) {
@@ -78,11 +75,14 @@ export class LoginPage implements OnInit {
                 CT_Pays: "FRANCE",
                 CT_Sommeil: 0,
                 CT_Telephone: "06 01 03 10 07",
-                CT_EMail: "contact@adranopizz.fr"
+                CT_EMail: "contact@adranopizz.fr",
+                MDP:"password"
             };
 
         // on ne va pas utiliser de set mais un systeme d'ajout/suppresion de compte. Ici, il est ajouté
         this.userService.addCustomer(compte);
+        this.userService.setActiveCustomer(compte);
+        // p-e a delete suite aux chgt authguard ( je check plus tard )
         this.storage.set('logged','logged');
         this.navCtrl.navigateForward(['/nav/article']);
     }
@@ -101,7 +101,6 @@ export class LoginPage implements OnInit {
         return await modal.present();
     }
 
-    // todo deplacer dans le service pour pouvoir reutiliser dans delete-acc
     async logInF_COMPTET() {
         if(this.login == '' || this.login == null)
             if(this.password == '' || this.password == null)
@@ -111,12 +110,13 @@ export class LoginPage implements OnInit {
         else if(this.password == '' || this.password == null)
             this.error = 'Veuillez entrer un mot de passe';
         else {
-            await this.userService.getUserValidity(this.login, this.password).then((data) => {
-                // this.storage.set('logged','logged');
+            await this.userService.getUserValidity(this.login, this.password).then((account:F_COMPTET) => {
+                this.storage.set('activeUser', JSON.stringify(account));
+                this.userService.setActiveCustomer(account);
+                this.userService.addCustomer(account);
                 this.navCtrl.navigateForward(['/nav/article']);
             }).catch((data) => {
                     this.error = data;
-                    console.log("fail");
                 }
             );
         }

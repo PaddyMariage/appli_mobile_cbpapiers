@@ -31,18 +31,8 @@ export class UserService {
     setActiveCustomer(f_comptet: F_COMPTET) {
         this.activeCustomer = f_comptet;
         this.activeCustomer$.next(this.activeCustomer);
-        this.dataStorage.ready().then(() => {
-            this.dataStorage.set('logged', this.activeCustomer);
-        });
+        localStorage.setItem('user', JSON.stringify(this.activeCustomer));
     }
-
-
-    // ici on fait simplement transiter un compte (pas forcément actif, utilisé dans settings)
-    setCustomer(f_comptet: F_COMPTET) {
-        this.customer = f_comptet;
-        this.activeCustomer$.next(this.customer);
-    }
-
 
     // Ajoute un compte au tableau de comptes du téléphone. Le client actif est attribué à ce moment la
     addCustomer(f_COMPTET: F_COMPTET) {
@@ -68,15 +58,11 @@ export class UserService {
 
     async getUserValidity(login: string, password: string) {
         let F_Comptet = null;
-        console.log("user validity");
         return new Promise((resolve, reject) => {
             this.getAllF_COMPTETs().subscribe(
                 (F_COMPTETs) => {
                     let found = false;
                     let index = 0;
-
-                    console.log(index);
-                    console.log(F_COMPTETs.length);
                     while (!found && index < F_COMPTETs.length) {
                         if (F_COMPTETs[index].CT_Num.toUpperCase() == login.toUpperCase() && password == F_COMPTETs[index].MDP) {
                             found = true;
@@ -85,19 +71,16 @@ export class UserService {
                             index++;
                         }
                     }
-                    if (found) {
-                        this.setActiveCustomer(F_Comptet);
-                        this.addCustomer(F_Comptet);
-                        this.getStorageLength();
+                    if (found)
                         resolve(F_Comptet);
-                    } else {
+                    else
                         reject('Mauvais identifiant/mot de passe');
-                    }
                 }
             );
         });
     }
 
+    // a supprimer ? ça sert à quoi ? tests ?
     setUserStorage(user: F_COMPTET) {
         // On attend que le storage prêt
         this.dataStorage.ready().then(() => {
@@ -107,6 +90,7 @@ export class UserService {
             this.getUserStorage(user.CT_Num));
     }
 
+    // si delete celle d'avant delete celle-ci aussi
     getUserStorage(login: string) {
         this.dataStorage.ready().then(() => {
             // systéme de promesse
@@ -135,10 +119,11 @@ export class UserService {
             return this.dataStorage.forEach((valeur: F_COMPTET) => {
                 this.customerAccounts.push(valeur);
                 console.log(valeur.CT_Num + " ajouté a customerAccounts");
-            }).then(() => this.getStorageLength().then((val) => {
+            }).then(() => this.getStorageLength().then((length) => {
                 this.customerAccounts$.next(this.customerAccounts);
-                console.log("val dans setAll vaut " + val);
-                return val;
+                this.activeCustomer$.next(this.customerAccounts[0]);
+                console.log("length dans setAll vaut " + length);
+                return length;
             }));
         })
     }
@@ -158,12 +143,18 @@ export class UserService {
         return this.customer;
     }
 
+    // ici on fait simplement transiter un compte (pas celui actif, utilisé dans settings)
+    setCustomer(f_comptet: F_COMPTET) {
+        this.customer = f_comptet;
+    }
+
     // Supprimer un compte des comptes sur le téléphone.
     // On cherche l'index dans le tableau et on le supprime, ensuite on met à jour les subscribes
     removeCustomer(customer: F_COMPTET) {
         if (this.activeCustomer === customer) {
             this.activeCustomer = null;
             this.activeCustomer$.next(customer);
+            this.dataStorage.remove('activeUser');
         }
         const i = this.customerAccounts.indexOf(this.customer);
         this.customerAccounts.splice(i, 1);

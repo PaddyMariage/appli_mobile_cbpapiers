@@ -14,8 +14,7 @@ const routes: Routes = [
     },
     {
         path: 'acc-choice',
-        loadChildren: () => import('./pages/acc-choice/acc-choice.module').then(m => m.AccChoicePageModule),
-        canActivate:[AuthGuard]
+        loadChildren: () => import('./pages/acc-choice/acc-choice.module').then(m => m.AccChoicePageModule)
     },
     {
         path: 'administration',
