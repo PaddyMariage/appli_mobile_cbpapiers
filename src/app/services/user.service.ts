@@ -86,6 +86,7 @@ export class UserService {
                         }
                     }
                     if (found) {
+                        this.setUserArrayStorage(F_Comptet);
                         this.setActiveCustomer(F_Comptet);
                         this.addCustomer(F_Comptet);
                         this.getStorageLength();
@@ -96,6 +97,66 @@ export class UserService {
                 }
             );
         });
+    }
+
+    setUserArrayStorage(user : F_COMPTET) {
+        
+        this.dataStorage.ready().then(() => {
+            console.log("c'est pas vide");
+            if (this.dataStorage.get('accounts')) {
+                this.dataStorage.get('accounts').then((accs : string) => {
+                    let accounts : F_COMPTET[] = JSON.parse(accs);
+                    let found = false;
+                    accounts.forEach((acc :F_COMPTET) => {
+                        if(user.CT_Num == acc.CT_Num) {
+                            found = true
+                        }
+                    });
+                    if (!found) {
+                        accounts.push(user);
+                        this.dataStorage.set('accounts', JSON.stringify(accounts));
+                        this.dataStorage.set('activeUser', user);
+                    }
+                })
+        } else {
+            let accounts : F_COMPTET[] = [];
+            console.log("C'est vide");
+            accounts.push(user);
+            this.dataStorage.set('accounts', JSON.stringify(accounts));
+        }
+        }).then(() => {
+                this.getArrayStorage();
+            });        
+    }
+
+    removeUserArrayStorage(user : F_COMPTET) {
+        
+        this.dataStorage.ready().then(() => {
+                this.dataStorage.get('accounts').then((accs : string) => {
+                    let accounts : F_COMPTET[] = JSON.parse(accs);
+                    let found = false;
+                    accounts.forEach((acc :F_COMPTET) => {
+                        if(user.CT_Num == acc.CT_Num) {
+                            found = true
+                        }
+                    });
+                    if (found) {
+                        let i = accounts.indexOf(user)
+                        accounts.splice(i, 1);
+                        this.dataStorage.set('accounts', JSON.stringify(accounts));
+                        this.dataStorage.set('activeUser', user);
+                    }
+                })
+        }); 
+    }
+
+    getArrayStorage() {
+            this.dataStorage.ready().then(() => {
+                this.dataStorage.get('accounts').then((accs : string) => {
+                    let accounts : F_COMPTET[] = JSON.parse(accs);
+                    console.log(accounts[0]);
+                })
+            })
     }
 
     setUserStorage(user: F_COMPTET) {

@@ -27,7 +27,7 @@ export class LoginPage implements OnInit {
                     this.platForm.ready().then(() => {
 
                         // Laissez cette méthode, elle sert a clean le stockage et a tester
-                        // this.storage.clear().then(() => {
+                        this.storage.clear().then(() => {
                             // J'attribue directement la taille du storage ici
                         this.userService.setAllUsersStorage().then((val : number) => {
                             this.userService.getUserLoggedStorage().then(() => {
@@ -35,7 +35,7 @@ export class LoginPage implements OnInit {
                                 console.log("le tableau vaut .. " + val);
                             })
                             
-                        // });
+                        });
                       }); 
                     });
                     // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
