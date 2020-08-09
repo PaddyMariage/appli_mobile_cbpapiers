@@ -31,18 +31,34 @@ export class UserService {
     setActiveCustomer(f_comptet: F_COMPTET) {
         this.activeCustomer = f_comptet;
         this.activeCustomer$.next(this.activeCustomer);
-        this.dataStorage.ready().then(() => {
-            this.dataStorage.set('logged', this.activeCustomer);
-        });
+        this.dataStorage.set('activeUser', f_comptet);
     }
 
-
-    // ici on fait simplement transiter un compte (pas forcément actif, utilisé dans settings)
-    setCustomer(f_comptet: F_COMPTET) {
-        this.customer = f_comptet;
-        this.activeCustomer$.next(this.customer);
+    setAllAccounts(f_comptets : F_COMPTET[]) {
+        this.customerAccounts = f_comptets;
+        this.customerAccounts$.next(this.customerAccounts);
+        this.dataStorage.set('accounts', JSON.stringify(f_comptets));
     }
 
+    getActiveUserFromStorage() {
+        let accounts : F_COMPTET[];
+        this.dataStorage.get('accounts').then((accs) => {
+            accounts = JSON.parse(accs);
+        }).then(()=> {
+            this.customerAccounts = accounts;
+            this.customerAccounts$.next(this.customerAccounts);
+        })
+    }
+
+    getAllUsersFromStorage() {
+        let activeAcc : F_COMPTET;
+        this.dataStorage.get('activeUser').then((accs) => {
+            activeAcc = JSON.parse(accs);
+        }).then(()=> {
+            this.activeCustomer = activeAcc;
+            this.activeCustomer$.next(activeAcc);
+        })
+    }
 
     // Ajoute un compte au tableau de comptes du téléphone. Le client actif est attribué à ce moment la
     addCustomer(f_COMPTET: F_COMPTET) {
@@ -68,15 +84,11 @@ export class UserService {
 
     async getUserValidity(login: string, password: string) {
         let F_Comptet = null;
-        console.log("user validity");
         return new Promise((resolve, reject) => {
             this.getAllF_COMPTETs().subscribe(
                 (F_COMPTETs) => {
                     let found = false;
                     let index = 0;
-
-                    console.log(index);
-                    console.log(F_COMPTETs.length);
                     while (!found && index < F_COMPTETs.length) {
                         if (F_COMPTETs[index].CT_Num.toUpperCase() == login.toUpperCase() && password == F_COMPTETs[index].MDP) {
                             found = true;
@@ -85,27 +97,22 @@ export class UserService {
                             index++;
                         }
                     }
-                    if (found) {
-                        this.setUserArrayStorage(F_Comptet);
-                        this.setActiveCustomer(F_Comptet);
-                        this.addCustomer(F_Comptet);
-                        this.getStorageLength();
+                    if (found)
                         resolve(F_Comptet);
-                    } else {
+                    else
                         reject('Mauvais identifiant/mot de passe');
-                    }
                 }
             );
         });
     }
 
-    setUserArrayStorage(user : F_COMPTET) {
-        
-        this.dataStorage.ready().then(() => {
-            console.log("c'est pas vide");
-            if (this.dataStorage.get('accounts')) {
-                this.dataStorage.get('accounts').then((accs : string) => {
-                    let accounts : F_COMPTET[] = JSON.parse(accs);
+    setUserArrayStorage(user : F_COMPTET) : Promise<void> {
+        return this.dataStorage.ready().then(() => {
+            let accounts : F_COMPTET[];
+            this.dataStorage.get('accounts').then((accs) => {
+                accounts = JSON.parse(accs);
+            if (accounts != null) {
+                    console.log("Compte trouvé")
                     let found = false;
                     accounts.forEach((acc :F_COMPTET) => {
                         if(user.CT_Num == acc.CT_Num) {
@@ -114,20 +121,21 @@ export class UserService {
                     });
                     if (!found) {
                         accounts.push(user);
-                        this.dataStorage.set('accounts', JSON.stringify(accounts));
-                        this.dataStorage.set('activeUser', user);
+                        this.setAllAccounts(accounts);
+                        this.setActiveCustomer(user);
                     }
-                })
         } else {
-            let accounts : F_COMPTET[] = [];
-            console.log("C'est vide");
-            accounts.push(user);
-            this.dataStorage.set('accounts', JSON.stringify(accounts));
+            console.log("Pas de comptes trouvé, création");
+            let userAccs : F_COMPTET[] = [];
+            userAccs.push(user);
+            this.setAllAccounts(userAccs);
+            this.setActiveCustomer(user);
         }
-        }).then(() => {
-                this.getArrayStorage();
-            });        
+        });   
+      });
     }
+
+
 
     removeUserArrayStorage(user : F_COMPTET) {
         
@@ -159,25 +167,6 @@ export class UserService {
             })
     }
 
-    setUserStorage(user: F_COMPTET) {
-        // On attend que le storage prêt
-        this.dataStorage.ready().then(() => {
-            // systéme de clé / valeur
-            this.dataStorage.set(user.CT_Num, user);
-        }).then(() =>
-            this.getUserStorage(user.CT_Num));
-    }
-
-    getUserStorage(login: string) {
-        this.dataStorage.ready().then(() => {
-            // systéme de promesse
-            this.dataStorage.get(login).then((data: F_COMPTET) => {
-                console.log("J'ai mon user " + data.CT_Num + " dans le storage");
-                return data;
-            });
-        });
-    }
-
     async getUserLoggedStorage() {
         await this.dataStorage.ready().then(() => {
             this.dataStorage.get('logged').then((data : F_COMPTET) => {
@@ -189,6 +178,16 @@ export class UserService {
         })
     }
 
+    getUsersStorageLength() : Promise<number> {
+        let comptes : F_COMPTET[];
+        let accTotal : number;
+        return this.dataStorage.get('accounts').then((accs) => 
+            comptes = JSON.parse(accs)
+        ).then(() => 
+            accTotal = comptes.length
+        );
+    }
+
     setAllUsersStorage(): Promise<number> {
         // les 3 returns sont obligatoires pour que la méthode fonctionne
         return this.dataStorage.ready().then(() => {
@@ -196,10 +195,9 @@ export class UserService {
             return this.dataStorage.forEach((valeur: F_COMPTET) => {
                 this.customerAccounts.push(valeur);
                 console.log(valeur.CT_Num + " ajouté a customerAccounts");
-            }).then(() => this.getStorageLength().then((val) => {
-                this.customerAccounts$.next(this.customerAccounts);
-                console.log("val dans setAll vaut " + val);
-                return val;
+            }).then(() => this.getStorageLength().then((length) => {
+                console.log("length dans setAll vaut " + length);
+                return length;
             }));
         })
     }
@@ -219,12 +217,18 @@ export class UserService {
         return this.customer;
     }
 
+    // ici on fait simplement transiter un compte (pas celui actif, utilisé dans settings)
+    setCustomer(f_comptet: F_COMPTET) {
+        this.customer = f_comptet;
+    }
+
     // Supprimer un compte des comptes sur le téléphone.
     // On cherche l'index dans le tableau et on le supprime, ensuite on met à jour les subscribes
     removeCustomer(customer: F_COMPTET) {
         if (this.activeCustomer === customer) {
             this.activeCustomer = null;
             this.activeCustomer$.next(customer);
+            this.dataStorage.remove('activeUser');
         }
         const i = this.customerAccounts.indexOf(this.customer);
         this.customerAccounts.splice(i, 1);

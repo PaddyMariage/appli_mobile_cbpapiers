@@ -24,21 +24,27 @@ export class DeleteAccPage implements OnInit {
 
     ngOnInit() {
         this.customer = this.userService.getCustomer();
+        console.log(this.customer.MDP);
     }
 
     // todo recup ce qui a ete fait dans login pour la logique
     // et virer 'logged' du storage si plus de comptes
-   /* deleteAcc() {
-        // recupere un msg d'erreur si invalid, sinon un account
-        let res = this.userService.getUserValidity(this.customer.name,this.password);
-        if(res == false)
-            this.error = "Mauvais mot de passe / identifiant";
-        else{
-            this.userService.removeCustomer(res);
-            if (this.userService.getAccounts().length != 0)
-                this.router.navigateByUrl('/acc-choice');
-            else
-                this.router.navigateByUrl('/login');
-        }
-    }*/
+   async deleteAcc() {
+       if(this.password == '' || this.password == null)
+           this.error = 'Veuillez entrer un mot de passe';
+       else {
+           await this.userService.getUserValidity(this.customer.CT_Num, this.password).then((data:F_COMPTET) => {
+               // on supprime l'utilisateur
+               this.userService.removeCustomer(this.customer);
+               // si on a supprime le seul compte existant, on renvoie au login
+               if(this.userService.getCustomerAccounts().length == 0)
+                   this.router.navigateByUrl('/login');
+               else
+                   this.router.navigateByUrl('/acc-choice');
+           }).catch(() => {
+                   this.error = 'Mauvais mot de passe';
+               }
+           );
+       }
+    }
 }

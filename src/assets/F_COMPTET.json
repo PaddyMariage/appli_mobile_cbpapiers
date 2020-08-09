@@ -7940,7 +7940,8 @@
    "CT_Pays": "FRANCE",
    "CT_Sommeil": 0,
    "CT_Telephone": "06 01 03 10 07",
-   "CT_EMail": "contact@adranopizz.fr"
+   "CT_EMail": "contact@adranopizz.fr",
+   "MDP": "password"
  },
  {
    "CT_Num": "SARLLES2FONTAINES",

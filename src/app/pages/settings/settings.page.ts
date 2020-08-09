@@ -12,12 +12,12 @@ import {F_COMPTET} from '../../models/JSON/F_COMPTET';
 })
 export class SettingsPage implements OnInit {
 
+    customer : F_COMPTET;
+
     constructor(private navCtrl: NavController,
                 private alertCtrl: AlertController,
                 private userService: UserService) {
     }
-
-    customer : F_COMPTET;
 
     ngOnInit() {
         this.customer = this.userService.getActiveCustomer();
@@ -25,6 +25,8 @@ export class SettingsPage implements OnInit {
 
     // Avance vers la page suppression de manière directe, comme une redirection
     async goToDeleteAccount() {
+        // on met le compte a supprimer dans le service pour le recuperer dans delete-acc
+        this.userService.setCustomer(this.customer);
         this.navCtrl.navigateForward(['/acc-choice/settings/delete-acc']);
     }
 

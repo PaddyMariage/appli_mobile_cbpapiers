@@ -35,7 +35,8 @@ export class AccChoicePage implements OnInit {
 
     // on indique simplement le compte que l'on va récupérer dans la page des options
     goToSettings(compte: F_COMPTET) {
-        this.userService.setActiveCustomer(compte);
+        this.userService.setCustomer(compte);
+        console.log(compte);
         this.navCtrl.navigateForward(['/acc-choice/settings']);
     }
 
