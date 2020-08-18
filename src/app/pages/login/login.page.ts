@@ -16,6 +16,7 @@ export class LoginPage implements OnInit {
     login: string;
     password: string;
     error: string;
+    storageSize : number;
 
     constructor(private navCtrl: NavController,
                 private modalController: ModalController,
@@ -25,20 +26,27 @@ export class LoginPage implements OnInit {
                 private storage: Storage) {
 
                     this.platForm.ready().then(() => {
-                            // J'attribue directement la taille du storage ici
-                        this.userService.getUsersStorageLength().then((val : number) => {
-                                this.userService.getActiveUserFromStorage();
-                                this.userService.getAllUsersFromStorage();
-                                this.redirection(val);
-                                console.log("le tableau vaut .. " + val);
-                            })
+                        // Je vérifie que le storage n'est pas vide une fois le storage prêt
+                        this.storage.ready().then(() => {
+                            this.storage.get('activeUser').then((actUser) => {   
+                                if (actUser != null) {   
+                                 // Si ce n'est pas vide, j'attribue directement la taille du storage ici
+                                this.userService.getUsersStorageLength().then((val : number) => {
+                                        this.userService.getActiveUserFromStorage();
+                                        this.userService.getAllUsersFromStorage();
+                                        this.storageSize = val;
+                                        this.redirection(val);
+                                    });
+                                } 
+                            });
                         });
+                    })
 
                     // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
                     // la méthode. Si l'url est similaire a la page de login et si c'est vide, redirige vers la liste
                     this.router.events.subscribe((e) => {
                         if (e instanceof NavigationEnd) {
-                            if (e.url == '/login' && this.userService.sizeStorage > 0)
+                            if (e.url == '/login' && this.storageSize > 0)
                                 this.router.navigateByUrl('/nav/article');
                         }
                     });
@@ -46,18 +54,14 @@ export class LoginPage implements OnInit {
 
 
     ngOnInit() {
-        //this.storage.clear();
+        // this.storage.clear();
     }
 
     redirection(val : number) {
         if (val == 1) {
-            console.log("Redirection vers article car 1");
             this.router.navigateByUrl('/nav/article');
         } else if (val > 1) {
-            console.log("Redirection vers acc choice");
             this.router.navigateByUrl('/acc-choice');
-        } else {
-            console.log("C'est vide :'(");
         }
     }
 

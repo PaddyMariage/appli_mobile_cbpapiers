@@ -3,6 +3,7 @@ import {UserService} from 'src/app/services/user.service';
 import {Router} from "@angular/router";
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
 import {Storage} from "@ionic/storage";
+import { NavController } from '@ionic/angular';
 
 @Component({
     selector: 'app-add-acc',
@@ -16,8 +17,7 @@ export class AddAccPage implements OnInit {
     error: string;
 
     constructor(private userService: UserService,
-                private router: Router,
-                private storage:Storage) {
+                private navCtrl : NavController) {
     }
 
     ngOnInit() {
@@ -33,10 +33,9 @@ export class AddAccPage implements OnInit {
             this.error = 'Veuillez entrer un mot de passe';
         else {
             await this.userService.getUserValidity(this.login, this.password).then((account:F_COMPTET) => {
-                this.storage.set('activeUser', JSON.stringify(account));
-                this.userService.setActiveCustomer(account); // sinon risque de bug si fleche retour sans avoir choisi de comptes
-                this.userService.addCustomer(account);
-                this.router.navigateByUrl('/nav/article');
+                this.userService.setUserArrayStorage(account).then(() => {
+                    this.navCtrl.navigateForward(['/nav/article']);
+                });
             }).catch((data) => {
                     this.error = data;
                 }

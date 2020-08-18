@@ -15,36 +15,35 @@ export class DeleteAccPage implements OnInit {
 
     customer: F_COMPTET;
     error: string;
+    login : string;
     password: string;
 
     constructor(private modalController: ModalController,
                 private userService: UserService,
-                private router: Router) {
+                private navCtrl : NavController) {
     }
 
     ngOnInit() {
         this.customer = this.userService.getCustomer();
-        console.log(this.customer.MDP);
     }
 
-    // todo recup ce qui a ete fait dans login pour la logique
-    // et virer 'logged' du storage si plus de comptes
-   async deleteAcc() {
-       if(this.password == '' || this.password == null)
-           this.error = 'Veuillez entrer un mot de passe';
-       else {
-           await this.userService.getUserValidity(this.customer.CT_Num, this.password).then((data:F_COMPTET) => {
-               // on supprime l'utilisateur
-               this.userService.removeCustomer(this.customer);
-               // si on a supprime le seul compte existant, on renvoie au login
-               if(this.userService.getCustomerAccounts().length == 0)
-                   this.router.navigateByUrl('/login');
-               else
-                   this.router.navigateByUrl('/acc-choice');
-           }).catch(() => {
-                   this.error = 'Mauvais mot de passe';
-               }
-           );
-       }
-    }
+    async deleteAcc() {
+        if(this.login == '' || this.login == null)
+            if(this.password == '' || this.password == null)
+                this.error = 'Veuillez entrer un identifiant & mot de passe';
+            else
+                this.error = 'Veuillez entrer un identifiant';
+        else if(this.password == '' || this.password == null)
+            this.error = 'Veuillez entrer un mot de passe';
+            else {
+                await this.userService.getUserValidity(this.login, this.password).then((account:F_COMPTET) => {
+                    this.userService.removeUserArrayStorage(account).then(() => {
+                        this.navCtrl.navigateRoot(['acc-choice']);
+                    });
+                }).catch((data) => {
+                        this.error = data;
+                    }
+                );
+            }
+        }
 }

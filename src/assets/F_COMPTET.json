@@ -20,7 +20,8 @@
    "CT_Pays": "France",
    "CT_Sommeil": 0,
    "CT_Telephone": "03 87 32 83 97",
-   "CT_EMail": "vert-net@orange.fr"
+   "CT_EMail": "vert-net@orange.fr",
+   "MDP": "password"
  },
  {
    "CT_Num": "VEENSTRA",
@@ -31,7 +32,8 @@
    "CT_Pays": "France",
    "CT_Sommeil": 0,
    "CT_Telephone": "03 87 64 28 19",
-   "CT_EMail": "julie.veenstra@orange.fr"
+   "CT_EMail": "julie.veenstra@orange.fr",
+   "MDP": "password"
  },
  {
    "CT_Num": "VALENTINA",

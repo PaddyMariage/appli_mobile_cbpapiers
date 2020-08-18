@@ -22,14 +22,14 @@
   <form onsubmit={this.processForm}>
     <ion-list>
       <ion-item>
-        <ion-input disabled [(ngModel)]="customer.CT_Num" name="customer name" placeholder="Identifiants" required type="text"></ion-input>
+        <ion-input [(ngModel)]="login" name="login" placeholder="Identifiants" required type="text"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-input [(ngModel)]="password" name="password" placeholder="Mot de passe" required type="password"></ion-input>
       </ion-item>
-    </ion-list>
-    <div class="red">{{error}}</div>
+    </ion-list>  
+    <div class="red"></div>
     <div class='ion-padding'>
       <ion-button expand="block" class="ion-no-margin" type="submit" (click)="deleteAcc()">Supprimer compte</ion-button>
     </div>

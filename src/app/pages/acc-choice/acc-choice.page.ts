@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {NavController} from '@ionic/angular';
 import {UserService} from 'src/app/services/user.service';
-import {Customer} from 'src/app/models/Customer';
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
     selector: 'app-choix-compte',
@@ -15,17 +15,27 @@ export class AccChoicePage implements OnInit {
     customer: F_COMPTET;
 
     constructor(private navCtrl: NavController,
-                private userService: UserService) {
+                private userService: UserService,
+                private router : Router) {
+                    this.router.events.subscribe((e) => {
+
+                        // susbscribe à tout changement dans la liste de comptes
+                        this.userService.activeCustomer$.subscribe(data => {
+                            this.customer = data;
+                        });
+                        this.userService.customerAccounts$.subscribe(data => {
+                            this.accounts = data;
+                        });
+                        
+                        // Pour tester la redirection, a delete par la suite si autre solution trouvé
+                        if (e instanceof NavigationEnd) {
+                            if (e.url == '/acc-choice' && this.accounts.length == 0)
+                                this.router.navigateByUrl('/login');
+                        }
+                    });
     }
 
     ngOnInit() {
-        // susbscribe à tout changement dans la liste de comptes
-        this.userService.activeCustomer$.subscribe(data => {
-            this.customer = data;
-        });
-        this.userService.customerAccounts$.subscribe(data => {
-            this.accounts = data;
-        });
     }
 
     selectAccountAndGoToArticles(customer: F_COMPTET) {

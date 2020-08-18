@@ -4,6 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {F_COMPTET} from '../models/JSON/F_COMPTET';
 import {F_DOCLIGNE} from '../models/JSON/F_DOCLIGNE';
 import {Storage} from "@ionic/storage";
+import { NavController } from '@ionic/angular';
 
 @Injectable({
     providedIn: 'root'
@@ -17,16 +18,9 @@ export class UserService {
     customerAccounts: F_COMPTET[] = [];
     public customerAccounts$: BehaviorSubject<F_COMPTET[]> = new BehaviorSubject<F_COMPTET[]>([]);
 
-    constructor(private http: HttpClient, private dataStorage: Storage) {
+    constructor(private http: HttpClient, private dataStorage: Storage, private navCtrl : NavController) {
 
     }
-
-    // récupère le compte actif
-    getActiveCustomer() {
-        return this.activeCustomer;
-    }
-
-
     // permet de définir quel est le compte actif puis l'envoie au subscribe
     setActiveCustomer(f_comptet: F_COMPTET) {
         this.activeCustomer = f_comptet;
@@ -34,30 +28,38 @@ export class UserService {
         this.dataStorage.set('activeUser', f_comptet);
     }
 
+     // récupère le compte actif
+     getActiveCustomer() {
+        return this.activeCustomer;
+    }
+
+
     setAllAccounts(f_comptets : F_COMPTET[]) {
         this.customerAccounts = f_comptets;
         this.customerAccounts$.next(this.customerAccounts);
         this.dataStorage.set('accounts', JSON.stringify(f_comptets));
     }
 
-    getActiveUserFromStorage() {
+    getAllUsersFromStorage() {
         let accounts : F_COMPTET[];
-        this.dataStorage.get('accounts').then((accs) => {
-            accounts = JSON.parse(accs);
-        }).then(()=> {
-            this.customerAccounts = accounts;
-            this.customerAccounts$.next(this.customerAccounts);
-        })
+        this.dataStorage.ready().then(() => {
+            this.dataStorage.get('accounts').then((accs) => {
+                accounts = JSON.parse(accs);
+            }).then(()=> {
+                this.customerAccounts = accounts;
+                this.customerAccounts$.next(this.customerAccounts);
+            });
+        });
     }
 
-    getAllUsersFromStorage() {
+    getActiveUserFromStorage() {
         let activeAcc : F_COMPTET;
         this.dataStorage.get('activeUser').then((accs) => {
-            activeAcc = JSON.parse(accs);
+            activeAcc = accs;
         }).then(()=> {
             this.activeCustomer = activeAcc;
             this.activeCustomer$.next(activeAcc);
-        })
+        });
     }
 
     // Ajoute un compte au tableau de comptes du téléphone. Le client actif est attribué à ce moment la
@@ -106,13 +108,15 @@ export class UserService {
         });
     }
 
+
+
     setUserArrayStorage(user : F_COMPTET) : Promise<void> {
         return this.dataStorage.ready().then(() => {
             let accounts : F_COMPTET[];
             this.dataStorage.get('accounts').then((accs) => {
                 accounts = JSON.parse(accs);
             if (accounts != null) {
-                    console.log("Compte trouvé")
+                    console.log("Comptes trouvé");
                     let found = false;
                     accounts.forEach((acc :F_COMPTET) => {
                         if(user.CT_Num == acc.CT_Num) {
@@ -135,26 +139,22 @@ export class UserService {
       });
     }
 
-
-
-    removeUserArrayStorage(user : F_COMPTET) {
-        
-        this.dataStorage.ready().then(() => {
+    removeUserArrayStorage(user : F_COMPTET) : Promise<void> {
+        return this.dataStorage.ready().then(() => {
                 this.dataStorage.get('accounts').then((accs : string) => {
                     let accounts : F_COMPTET[] = JSON.parse(accs);
-                    let found = false;
-                    accounts.forEach((acc :F_COMPTET) => {
-                        if(user.CT_Num == acc.CT_Num) {
-                            found = true
-                        }
-                    });
-                    if (found) {
-                        let i = accounts.indexOf(user)
-                        accounts.splice(i, 1);
-                        this.dataStorage.set('accounts', JSON.stringify(accounts));
-                        this.dataStorage.set('activeUser', user);
-                    }
-                })
+                    let i = accounts.indexOf(user);
+                    accounts.splice(i, 1);
+                    this.dataStorage.set('accounts', JSON.stringify(accounts));
+                    this.dataStorage.set('activeUser', accounts[0]);
+
+                    /* if (accounts.length > 0) {
+                        console.log("Pas vide");
+                        this.navCtrl.navigateRoot(['/nav/article']);
+                    } else
+                        console.log("Vide");
+                        this.navCtrl.navigateRoot(['/login']); */
+            }); 
         }); 
     }
 
