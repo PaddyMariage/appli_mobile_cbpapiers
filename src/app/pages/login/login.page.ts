@@ -28,16 +28,15 @@ export class LoginPage{
         this.platForm.ready().then(() => {
             // Je vérifie que le storage n'est pas vide une fois le storage prêt
             this.storage.ready().then(async () => {
-                await this.userService.initActiveUserFromStorage();
-                await this.userService.initAllUsersFromStorage();
-
-
-                if(this.userService.getActiveCustomer() != null) {
-                    this.router.navigateByUrl('/nav/article');
-                } else {
-                    if (this.userService.getCustomerAccounts().length > 1)
-                        this.router.navigateByUrl('/acc-choice');
-                }
+                this.userService.initActiveUserFromStorage().then(() =>{
+                    this.userService.initAllUsersFromStorage().then(() => {
+                        if(this.userService.getActiveCustomer() != null)
+                            this.router.navigateByUrl('/nav/article');
+                        else
+                        if (this.userService.getCustomerAccounts().length > 1)
+                            this.router.navigateByUrl('/acc-choice');
+                    });
+                });
             });
         })
 
@@ -100,7 +99,9 @@ export class LoginPage{
             this.error = 'Veuillez entrer un mot de passe';
         else {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
+                console.log('user validity done');
                 this.userService.setUserArrayStorage(account).then(() => {
+                    console.log('redirection');
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
             }).catch((data:string) => {

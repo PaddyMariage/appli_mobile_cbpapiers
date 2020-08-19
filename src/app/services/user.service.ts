@@ -20,7 +20,6 @@ export class UserService {
     public customerAccounts$: BehaviorSubject<F_COMPTET[]> = new BehaviorSubject<F_COMPTET[]>([]);
 
     constructor(private http: HttpClient, private dataStorage: Storage, private navCtrl : NavController) {
-
     }
 
     // permet de définir quel est le compte actif puis l'envoie au subscribe
@@ -105,6 +104,8 @@ export class UserService {
     }
 
     setUserArrayStorage(user: F_COMPTET): Promise<void> {
+        console.log('test');
+        //this.customerAccounts = [];
         return new Promise<void>( (resolve) => {
             let index = 0;
             let found = false;
@@ -127,7 +128,7 @@ export class UserService {
         let found = false;
         if(this.customer.CT_Num == user.CT_Num) {
             this.customer = null;
-            this.activeCustomer$.next(null);
+            this.customer$.next(null);
             this.dataStorage.remove('activeUser');
         }
 
