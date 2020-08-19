@@ -43,8 +43,7 @@ export class ArticlePage implements OnInit {
         this.userService.activeCustomer$.subscribe(
             customer => {
                 // on ne refresh pas si c'est déjà celui présent dans la page
-                // test à déplacer dans le service
-                if(this.customer !== customer) {
+                if(this.customer == null || this.customer.CT_Num != customer.CT_Num) {
                     this.orderLineList = [];
                     this.customer = customer;
                     this.initTopF_ARTICLE();
@@ -54,6 +53,7 @@ export class ArticlePage implements OnInit {
     }
 
     initTopF_ARTICLE() {
+        console.log('in initTopF_ARTICLE()');
         let articlesAndFrequency: [string, string, number][] = [];
         let AR_Ref_Array: string[] = [];
         const ctNum = this.customer.CT_Num;
@@ -63,10 +63,8 @@ export class ArticlePage implements OnInit {
                 F_DOCLIGNES.forEach(
                     (DOCLIGNE) => {
                         if (DOCLIGNE.CT_Num == ctNum && DOCLIGNE.AR_Ref.trim() != '')
-
                             if (AR_Ref_Array.indexOf(DOCLIGNE.AR_Ref.trim()) != -1)
                                 articlesAndFrequency[AR_Ref_Array.indexOf(DOCLIGNE.AR_Ref.trim())][2]++;
-
                             else {
                                 AR_Ref_Array.push(DOCLIGNE.AR_Ref.trim());
                                 articlesAndFrequency.push([DOCLIGNE.AR_Ref.trim(), DOCLIGNE.DL_Design, 1]);

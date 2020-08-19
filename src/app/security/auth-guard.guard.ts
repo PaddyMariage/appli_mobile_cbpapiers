@@ -15,11 +15,7 @@ export class AuthGuard implements CanActivate {
     }
 
     async canActivate() {
-        await this.storage.get('activeUser').then((logged:string) => {
-            this.access = true;
-        }).catch(() => {
-            this.access = false;
-        })
+        this.access = this.userService.getActiveCustomer() != null;
 
         if (this.access == false) {
             await this.router.navigateByUrl('/login');

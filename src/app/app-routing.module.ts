@@ -13,7 +13,8 @@ const routes: Routes = [
     },
     {
         path: 'acc-choice',
-        loadChildren: () => import('./pages/acc-choice/acc-choice.module').then(m => m.AccChoicePageModule)
+        loadChildren: () => import('./pages/acc-choice/acc-choice.module').then(m => m.AccChoicePageModule),
+        canActivate: [AuthGuard]
     },
     {
         path: 'administration',

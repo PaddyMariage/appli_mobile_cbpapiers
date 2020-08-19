@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ModalController, NavController, Platform} from '@ionic/angular';
 import {ContactPageModule} from '../contact/contact.module';
 import {UserService} from 'src/app/services/user.service';
-import {Router, NavigationEnd} from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
 import {F_COMPTET} from '../../models/JSON/F_COMPTET';
 import {Storage} from "@ionic/storage";
 
@@ -11,58 +11,44 @@ import {Storage} from "@ionic/storage";
     templateUrl: './login.page.html',
     styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit {
+export class LoginPage{
 
     login: string;
     password: string;
     error: string;
-    storageSize : number;
+    storageSize: number;
 
     constructor(private navCtrl: NavController,
                 private modalController: ModalController,
                 private userService: UserService,
                 private router: Router,
-                private platForm : Platform,
+                private platForm: Platform,
                 private storage: Storage) {
 
-                    this.platForm.ready().then(() => {
-                        // Je vérifie que le storage n'est pas vide une fois le storage prêt
-                        this.storage.ready().then(() => {
-                            this.storage.get('activeUser').then((actUser) => {   
-                                if (actUser != null) {   
-                                 // Si ce n'est pas vide, j'attribue directement la taille du storage ici
-                                this.userService.getUsersStorageLength().then((val : number) => {
-                                        this.userService.getActiveUserFromStorage();
-                                        this.userService.getAllUsersFromStorage();
-                                        this.storageSize = val;
-                                        this.redirection(val);
-                                    });
-                                } 
-                            });
-                        });
-                    })
+        this.platForm.ready().then(() => {
+            // Je vérifie que le storage n'est pas vide une fois le storage prêt
+            this.storage.ready().then(async () => {
+                await this.userService.initActiveUserFromStorage();
+                await this.userService.initAllUsersFromStorage();
 
-                    // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
-                    // la méthode. Si l'url est similaire a la page de login et si c'est vide, redirige vers la liste
-                    this.router.events.subscribe((e) => {
-                        if (e instanceof NavigationEnd) {
-                            if (e.url == '/login' && this.storageSize > 0)
-                                this.router.navigateByUrl('/nav/article');
-                        }
-                    });
+
+                if(this.userService.getActiveCustomer() != null) {
+                    this.router.navigateByUrl('/nav/article');
+                } else {
+                    if (this.userService.getCustomerAccounts().length > 1)
+                        this.router.navigateByUrl('/acc-choice');
                 }
+            });
+        })
 
-
-    ngOnInit() {
-        // this.storage.clear();
-    }
-
-    redirection(val : number) {
-        if (val == 1) {
-            this.router.navigateByUrl('/nav/article');
-        } else if (val > 1) {
-            this.router.navigateByUrl('/acc-choice');
-        }
+        // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
+        // la méthode. Si l'url est similaire a la page de login et si c'est vide, redirige vers la liste
+        this.router.events.subscribe((e) => {
+            if (e instanceof NavigationEnd) {
+                if (e.url == '/login' && this.storageSize > 0)
+                    this.router.navigateByUrl('/nav/article');
+            }
+        });
     }
 
 
@@ -79,14 +65,14 @@ export class LoginPage implements OnInit {
                 CT_Sommeil: 0,
                 CT_Telephone: "06 01 03 10 07",
                 CT_EMail: "contact@adranopizz.fr",
-                MDP:"password"
+                MDP: "password"
             };
 
         // on ne va pas utiliser de set mais un systeme d'ajout/suppresion de compte. Ici, il est ajouté
         this.userService.addCustomer(compte);
         this.userService.setActiveCustomer(compte);
         // p-e a delete suite aux chgt authguard ( je check plus tard )
-        this.storage.set('logged','logged');
+        this.storage.set('logged', 'logged');
         this.navCtrl.navigateForward(['/nav/article']);
     }
 
@@ -105,19 +91,19 @@ export class LoginPage implements OnInit {
     }
 
     async logInF_COMPTET() {
-        if(this.login == '' || this.login == null)
-            if(this.password == '' || this.password == null)
+        if (this.login == '' || this.login == null)
+            if (this.password == '' || this.password == null)
                 this.error = 'Veuillez entrer un identifiant & mot de passe';
             else
                 this.error = 'Veuillez entrer un identifiant';
-        else if(this.password == '' || this.password == null)
+        else if (this.password == '' || this.password == null)
             this.error = 'Veuillez entrer un mot de passe';
         else {
-            await this.userService.getUserValidity(this.login, this.password).then((account:F_COMPTET) => {
+            await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
                 this.userService.setUserArrayStorage(account).then(() => {
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
-            }).catch((data) => {
+            }).catch((data:string) => {
                     this.error = data;
                 }
             );

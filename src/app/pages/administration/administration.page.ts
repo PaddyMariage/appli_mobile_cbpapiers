@@ -122,4 +122,3 @@ export class AdministrationPage implements OnInit {
         // this.userService.setCustomerAccounts(this.comptes);
     }
 }
-
