@@ -145,8 +145,22 @@ export class UserService {
                     let accounts : F_COMPTET[] = JSON.parse(accs);
                     let i = accounts.indexOf(user);
                     accounts.splice(i, 1);
+                    if (accounts.length > 0) {
+                        console.log("IL reste des comptes");
+                        this.dataStorage.set('accounts', JSON.stringify(accounts));
+                        this.dataStorage.set('activeUser', accounts[0]);
+                        this.customerAccounts = accounts;
+                        this.activeCustomer = accounts[0];
+                    } else {
+                        console.log("Ya plus de comptes");
+                        this.customerAccounts = [];
+                        this.activeCustomer = null;
+                        this.dataStorage.set('activeUser', null);
+                    }
                     this.dataStorage.set('accounts', JSON.stringify(accounts));
-                    this.dataStorage.set('activeUser', accounts[0]);
+                    this.customerAccounts$.next(this.customerAccounts);
+                    this.activeCustomer$.next(this.activeCustomer);
+                    
 
                     /* if (accounts.length > 0) {
                         console.log("Pas vide");

@@ -38,7 +38,7 @@ export class DeleteAccPage implements OnInit {
             else {
                 await this.userService.getUserValidity(this.login, this.password).then((account:F_COMPTET) => {
                     this.userService.removeUserArrayStorage(account).then(() => {
-                        this.navCtrl.navigateRoot(['acc-choice']);
+                        this.navCtrl.navigateRoot(['login']);
                     });
                 }).catch((data) => {
                         this.error = data;
