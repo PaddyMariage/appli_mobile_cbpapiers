@@ -27,7 +27,6 @@ export class ReorderPage implements OnInit {
     }
 
     toggled() {
-        // todo passer le boolean au service pour le back
         this.warehouseRetrieval = !this.warehouseRetrieval;
         this.updateTotal();
     }
@@ -45,10 +44,6 @@ export class ReorderPage implements OnInit {
             this.total += 20;
     }
 
-    // todo faire en sorte d'envoyer pdf par mail
-    startOrder() {
-        
-    }
 
     // met a jour le cart dans le service
     updateCart() {

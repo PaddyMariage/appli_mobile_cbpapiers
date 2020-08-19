@@ -121,6 +121,5 @@ export class AdministrationPage implements OnInit {
         // todo behaviour
         // this.userService.setCustomerAccounts(this.comptes);
     }
-
 }
 
