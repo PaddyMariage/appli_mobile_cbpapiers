@@ -3,8 +3,7 @@ import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
 import {AuthGuard} from "./security/auth-guard.guard";
 
 const routes: Routes = [
-    // todo mettre le authguard partout sauf login
-    { // Actuellement on se sert du rooting de tabs (nav) ici pour ce qui est comamnde etc.
+    {
         path: 'nav',
         loadChildren: () => import('./pages/tabs/tabs.module').then(m => m.TabsPageModule),
     },

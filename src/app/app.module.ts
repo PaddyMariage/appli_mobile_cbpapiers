@@ -16,7 +16,6 @@ import {FileOpener} from '@ionic-native/file-opener/ngx';
 import {EmailComposer} from '@ionic-native/email-composer/ngx';
 import {UserService} from "./services/user.service";
 
-// todo verifier que cartPage, SingleOrderPage, OrderValidationPage marchent
 @NgModule({
     declarations: [AppComponent],
     imports: [BrowserModule, IonicModule.forRoot(), IonicStorageModule.forRoot(), AppRoutingModule, FormsModule, HttpClientModule],

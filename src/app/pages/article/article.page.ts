@@ -43,8 +43,9 @@ export class ArticlePage implements OnInit {
         this.userService.activeCustomer$.subscribe(
             customer => {
                 // on ne refresh pas si c'est déjà celui présent dans la page
+                // test à déplacer dans le service
                 if(this.customer !== customer) {
-                    this.orderLineList = []
+                    this.orderLineList = [];
                     this.customer = customer;
                     this.initTopF_ARTICLE();
                 }

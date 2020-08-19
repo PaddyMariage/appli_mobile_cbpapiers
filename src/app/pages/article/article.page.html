@@ -1,43 +1,29 @@
 <app-header></app-header>
-
 <ion-content>
     <!--Debounce permet d'attendre un certain temps avant le dernier input pour pas faire 458 requêtes
     $event sert à récolter les inputs et a les envoyer dans un objet de type DOM event (https://angular.io/guide/user-input)-->
     <ion-searchbar showCancelButton="focus" debounce="500" (ionChange)="getArticleSearched($event)"
-                   animated placeholder="Rechercher.." class="searchbar"></ion-searchbar>
+                   animated placeholder="Rechercher..." class="searchbar"></ion-searchbar>
     <ion-list>
         <ion-list-header>
-            <ion-label>
-                <strong>Mes produits favoris :</strong>
-            </ion-label>
+            <ion-label><strong>Mes produits favoris :</strong></ion-label>
         </ion-list-header>
         <ion-item *ngFor="let orderLine of orderLineList">
             <ion-thumbnail slot="start" (click)="createOrderLineDetails(orderLine)">
                 <span *ngIf="orderLine.article.articleImage != undefined && orderLine.article.articleImage.image != undefined; else emptyImage ">
                     <img src="{{orderLine.article.articleImage.image}}"/>
                 </span>
-                <ng-template #emptyImage>
-                    <img src="./assets/icon/not_found.jpg"/>
-                </ng-template>
+                <ng-template #emptyImage><img src="./assets/icon/not_found.jpg"/></ng-template>
             </ion-thumbnail>
-
-            <span>
-                <button (click)=createOrderLineDetails(orderLine)>
-                    <ion-label><small>{{orderLine.article.reference}}</small></ion-label>
-                    {{orderLine.article.label | slice: 0 : 25}}
-                </button>
-            </span>
-
+            <button (click)=createOrderLineDetails(orderLine)>
+                <ion-label><small>{{orderLine.article.reference}}</small></ion-label>
+                {{orderLine.article.label | slice: 0 : 25}}
+            </button>
             <span slot="end">{{orderLine.article.unitPrice | number:'1.2-2'}} €</span>
-            <ion-select
-                    slot="end"
-                    interface="popover"
-                    (ionChange)="onChangeOrderLine($event, orderLine)"
-                    value="{{orderLine.quantity}}">
+            <ion-select slot="end" interface="popover" (ionChange)="onChangeOrderLine($event, orderLine)"
+                        value="{{orderLine.quantity}}">
                 <ion-item *ngFor="let chiffre of possibleQuantities">
-                    <ion-select-option value="{{chiffre}}">
-                        {{chiffre}}
-                    </ion-select-option>
+                    <ion-select-option value="{{chiffre}}"> {{chiffre}} </ion-select-option>
                 </ion-item>
             </ion-select>
         </ion-item>

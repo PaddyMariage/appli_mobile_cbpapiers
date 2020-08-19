@@ -117,7 +117,6 @@ export class LoginPage implements OnInit {
                 this.userService.setUserArrayStorage(account).then(() => {
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
-                
             }).catch((data) => {
                     this.error = data;
                 }

@@ -108,8 +108,6 @@ export class UserService {
         });
     }
 
-
-
     setUserArrayStorage(user : F_COMPTET) : Promise<void> {
         return this.dataStorage.ready().then(() => {
             let accounts : F_COMPTET[];
