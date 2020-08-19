@@ -104,8 +104,8 @@ export class UserService {
     }
 
     setUserArrayStorage(user: F_COMPTET): Promise<void> {
-        console.log('test');
-        //this.customerAccounts = [];
+        if(this.customerAccounts == null)
+            this.customerAccounts = [];
         return new Promise<void>( (resolve) => {
             let index = 0;
             let found = false;

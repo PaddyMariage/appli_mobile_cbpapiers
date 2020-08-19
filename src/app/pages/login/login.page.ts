@@ -11,7 +11,10 @@ import {Storage} from "@ionic/storage";
     templateUrl: './login.page.html',
     styleUrls: ['./login.page.scss'],
 })
-export class LoginPage{
+export class LoginPage implements OnInit{
+    ngOnInit(): void {
+        //this.storage.clear();
+    }
 
     login: string;
     password: string;
@@ -39,6 +42,7 @@ export class LoginPage{
                 });
             });
         })
+
 
         // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
         // la méthode. Si l'url est similaire a la page de login et si c'est vide, redirige vers la liste
@@ -99,9 +103,7 @@ export class LoginPage{
             this.error = 'Veuillez entrer un mot de passe';
         else {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
-                console.log('user validity done');
                 this.userService.setUserArrayStorage(account).then(() => {
-                    console.log('redirection');
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
             }).catch((data:string) => {

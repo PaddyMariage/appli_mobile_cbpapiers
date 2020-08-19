@@ -15,13 +15,14 @@ export class AccChoicePage {
     customer: F_COMPTET;
 
     constructor(private navCtrl: NavController,
-                private userService: UserService,
-                private router: Router) {
+                private userService: UserService) {
 
         // susbscribe à tout changement dans la liste de comptes
         this.userService.customer$.subscribe(data => {
             this.customer = data;
         });
+        this.customer = this.userService.getActiveCustomer();
+        console.log(this.customer);
         this.userService.customerAccounts$.subscribe(data => {
             this.accounts = data;
         });

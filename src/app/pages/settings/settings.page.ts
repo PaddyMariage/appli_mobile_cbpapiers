@@ -20,7 +20,7 @@ export class SettingsPage implements OnInit {
     }
 
     ngOnInit() {
-        this.customer = this.userService.getActiveCustomer();
+        this.customer = this.userService.getCustomer();
     }
 
     // Avance vers la page suppression de manière directe, comme une redirection

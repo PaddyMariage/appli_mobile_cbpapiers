@@ -37,8 +37,6 @@ export class DeleteAccPage implements OnInit {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
                 // je delete du storage & du service
                 this.userService.removeUserArrayStorage(account);
-                // je recupere le customer ( il est mis a null si le customer delete c'est celui actif )
-                this.customer = this.userService.getCustomer();
 
                 // je redirige en fonction du nombre d'utilisateurs restant
                 if (this.userService.getCustomerAccounts().length == 0)
