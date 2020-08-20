@@ -16,6 +16,7 @@ import {OrderService} from '../../services/order.service';
 import {Order} from '../../models/Order';
 import { cloneDeep } from 'lodash';
 import {GenerateIDService} from '../../services/generate-id.service';
+import {Storage} from "@ionic/storage";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -40,7 +41,8 @@ export class OrderValidationPage implements OnInit {
                 private userService: UserService,
                 private orderService: OrderService,
                 private modalController: ModalController,
-                private generateIdService: GenerateIDService) {
+                private generateIdService: GenerateIDService,
+                private storage : Storage) {
     }
 
     ngOnInit() {
@@ -89,7 +91,7 @@ export class OrderValidationPage implements OnInit {
                     orderNumber: this.generateIdService.generate(),
                     orderDate: new Date(),
                     customer : this.userService.getActiveCustomer(),
-                    orderLines: this.cartService.getCart().orderLines
+                    orderLines: this.cartService.getCart().orderLines,
                 };
             this.sendPdf();
         } else {
@@ -100,7 +102,7 @@ export class OrderValidationPage implements OnInit {
 
     sendPdf() {
         // enregistrement de la commande réalisée dans le tableau des commandes de orderService
-        const docDefinition = {
+        let docDefinition = {
             content: [
                 {text: 'CBPAPIERS', style: 'header'},
                 // impression de la date au format dd/mm/yyyy hh'h'mm
