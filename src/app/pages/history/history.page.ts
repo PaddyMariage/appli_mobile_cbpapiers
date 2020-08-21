@@ -25,18 +25,24 @@ export class HistoryPage implements OnInit {
                 // on met à jour le customer s'il est null ou différent de celui actif. Puis on retest l'historique
                 if(this.customer == null || this.customer.CT_Num != customer.CT_Num) {
                     this.customer = customer;
-                    this.orderService.initAndGetOrdersStorage().then((orders : Order[]) => {
-                        this.history = orders;
-                    });        
+                    // on check s'il y a des commandes a afficher ou non puis on attribue ou non l'historique de commande
+                    this.orderService.isOrdersStorageEmpty().then((boolean) => {
+                        if (!boolean) {
+                            this.orderService.initAndGetOrdersStorage().then((orders : Order[]) => {
+                            this.history = orders;
+                            });  
+                        }
+                    });
+                       
+                    }
                 }
-            }
-        );
-    }
+        );}
 
 
 
     onClickOrder(order: Order) {
         this.orderService.setOrder(order);
+        this.orderService.setOrders(this.history);
     }
 
 

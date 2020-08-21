@@ -24,6 +24,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export class SingleOrderPage implements OnInit {
 
     order: Order;
+    orders : Order[] = []
     total = 0;
     canEdit: boolean;
     pdfObj = null;
@@ -45,6 +46,7 @@ export class SingleOrderPage implements OnInit {
 
     ngOnInit(): void {
         this.order = this.orderService.getOrder();
+        this.orders = this.orderService.getOrders();
         this.total = 0;
         this.order.orderLines.forEach(value => this.total += (value.article.unitPrice * value.quantity));
         this.calculateDeadLine();
@@ -102,7 +104,8 @@ export class SingleOrderPage implements OnInit {
         });
         await alert.present();
     }
-
+    // todo : supprimer la commande du storage mais pas toucher a l'appli comme ça ça sera affiché comme annulé mais
+    // elle ne sera plus la une fois l'appli fermé/rouverte.
     private sendCancel() {
         this.createPdf();
         this.sendMail();
@@ -113,9 +116,6 @@ export class SingleOrderPage implements OnInit {
 
     // méthode appelée lorsqu'on veut recommander à partir de la commande (ajout des articles de la commande dans le panier)
     reorder() {
-        // création du toast
-        // this.toastClick();
-        // fait un deep clone de la commande
         const newCart = cloneDeep(this.order);
         // on met l'orderNumber du panier à null car on va refaire une nouvelle commande et non une édition de la commande
         newCart.orderNumber = null;
@@ -133,6 +133,7 @@ export class SingleOrderPage implements OnInit {
         this.cartService.setOrderLineList(newCart.orderLines);
         // on envoie les informations sur la commande dans le cartService afin qu'il sache qu'il s'agit d'une édition de commande
         this.cartService.updateCartInfos(newCart.orderNumber, newCart.orderDate);
+        this.navController.navigateBack(['/nav/history']);
         this.navController.navigateBack(['/nav/article']);
     }
 

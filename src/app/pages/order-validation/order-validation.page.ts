@@ -85,6 +85,7 @@ export class OrderValidationPage implements OnInit {
 
     checkEditOrderOrNot(){
         if (this.order.orderNumber == null){
+            console.log("Commande non présente");
             this.order =
                 {
                     // numéro de commande généré dans le service generateID
@@ -95,6 +96,7 @@ export class OrderValidationPage implements OnInit {
                 };
             this.sendPdf();
         } else {
+            console.log("Commande déjà présente");
             this.order = this.cartService.getCart();
             this.sendPdfEdit();
         }
@@ -226,7 +228,8 @@ export class OrderValidationPage implements OnInit {
         // on fait un clone de la commande
         // on envoie ce clone pour modification de la commande déjà existante avec le même numéro de commande
         const ORDER_HISTORY = cloneDeep(this.order);
-        this.orderService.editOrder(ORDER_HISTORY);
+        this.orderService.editOrderStorage(ORDER_HISTORY);
+        // this.orderService.editOrder(ORDER_HISTORY);
 
 
         // on reinitialise les orderlines de panier pour le remettre à 0
@@ -288,5 +291,6 @@ export class OrderValidationPage implements OnInit {
         this.cartService.resetCart();
         this.warehouseRetService.setStatus(false);
         this.onDismiss();
+        console.log("Delete effectué");
     }
 }
