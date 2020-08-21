@@ -35,8 +35,8 @@ export class HistoryPage implements OnInit {
                     });
                        
                     }
-                }
-        );}
+                });
+    }
 
 
 

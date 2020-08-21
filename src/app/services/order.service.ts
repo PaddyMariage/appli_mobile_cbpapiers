@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Order} from "../models/Order";
 import {Storage} from "@ionic/storage";
 import { UserService } from './user.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -9,6 +10,7 @@ import { UserService } from './user.service';
 export class OrderService {
     private order: Order;
     private orders: Order[] = [];
+    public order$ : BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
 
     constructor(private dataStorage : Storage,
                 private userService : UserService) {
@@ -16,6 +18,7 @@ export class OrderService {
 
     // transfère une order (utilise dans l'history)
     setOrder(order: Order) {
+        this.order$.next(order);
         this.order = order;
     }
 
@@ -88,6 +91,7 @@ export class OrderService {
             // je réattribue le tableau avec l'objet modifié et je relance l'initialisation d'orders
             this.dataStorage.set('orders', JSON.stringify(ordersTotal)).then(() => {
                 this.initAndGetOrdersStorage();
+                this.setOrder(order);
             });
         });
     }
