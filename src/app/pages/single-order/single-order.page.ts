@@ -48,9 +48,11 @@ export class SingleOrderPage implements OnInit {
         this.orderService.order$.subscribe( 
             order => {
                 this.order = order;
+                this.total = 0;
+                this.order.orderLines.forEach(value => this.total += (value.article.unitPrice * value.quantity));
         });
-        
-        this.orders = this.orderService.getOrders();
+
+        this.orders = this.orderService.getActiveOrders();
         this.total = 0;
         this.order.orderLines.forEach(value => this.total += (value.article.unitPrice * value.quantity));
         this.calculateDeadLine();
@@ -114,6 +116,7 @@ export class SingleOrderPage implements OnInit {
         this.createPdf();
         this.sendMail();
         this.orderService.getOrder().isCancelled = true;
+        this.orderService.deleteOrder(this.orderService.getOrder());
         this.navController.navigateBack(['/nav/history']);
 
     }
@@ -159,12 +162,15 @@ export class SingleOrderPage implements OnInit {
                   {text: 'CBPAPIERS', style: 'header'},
                   // impression de la date au format dd/mm/yyyy hh'h'mm
                   {
-                      text: new Date().toLocaleDateString() + ' '
-                          + new Date().toLocaleTimeString(),
+                        /* CODE COMMENTE POUR QUE CA FONCTIONNE
+                        text: new Date().toLocaleDateString() + ' '
+                          + new Date().toLocaleTimeString(), */
+                        text : new Date(),
                       alignment: 'right'
                   },
-                  {text: 'Commande du : ' + this.order.orderDate.toLocaleDateString() + ' '
-                          + this.order.orderDate.toLocaleTimeString(), style: 'subheader'},
+                  /* {text: 'Commande du : ' + this.order.orderDate.toLocaleDateString() + ' '
+                          + this.order.orderDate.toLocaleTimeString(), style: 'subheader'} , */
+                  {text: 'Commande du : ' + this.order.orderDate},
                   {text: 'Ref client : ' + this.userService.getActiveCustomer().CT_Num},
                   {text: this.userService.getActiveCustomer().CT_Intitule},
                   {text: this.userService.getActiveCustomer().CT_Adresse},

@@ -20,6 +20,12 @@ export class HistoryPage implements OnInit {
     }
 
     ngOnInit() {
+
+        this.orderService.ordersActive$.subscribe(
+            orders => {
+                this.history = orders;
+        });
+
         this.userService.activeCustomer$.subscribe(
             customer => {
                 // on met à jour le customer s'il est null ou différent de celui actif. Puis on retest l'historique
@@ -27,22 +33,19 @@ export class HistoryPage implements OnInit {
                     this.customer = customer;
                     // on check s'il y a des commandes a afficher ou non puis on attribue ou non l'historique de commande
                     this.orderService.isOrdersStorageEmpty().then((boolean) => {
-                        if (!boolean) {
-                            this.orderService.initAndGetOrdersStorage().then((orders : Order[]) => {
-                            this.history = orders;
-                            });  
-                        }
+                        console.log(boolean);
+                        if (!boolean) 
+                            this.orderService.initAndGetOrdersStorage()
                     });
                        
-                    }
-                });
+                }
+            });
     }
 
 
 
     onClickOrder(order: Order) {
         this.orderService.setOrder(order);
-        this.orderService.setOrders(this.history);
     }
 
 

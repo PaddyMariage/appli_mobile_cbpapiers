@@ -109,7 +109,9 @@ export class OrderValidationPage implements OnInit {
                 {text: 'CBPAPIERS', style: 'header'},
                 // impression de la date au format dd/mm/yyyy hh'h'mm
                 {
-                    text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
+                    //text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    text : new Date() + ' ',
                     alignment: 'right'
                 },
                 {text: 'Commande : ', style: 'subheader'},
@@ -172,12 +174,18 @@ export class OrderValidationPage implements OnInit {
                 {text: 'CBPAPIERS', style: 'header'},
                 // impression de la date au format dd/mm/yyyy hh'h'mm
                 {
-                    text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
+                    // text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    text : new Date() + ' ',
                     alignment: 'right'
                 },
                 // tslint:disable-next-line:max-line-length
-                {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' ' + this.cartService.getCart().orderDate.toLocaleDateString() +
-                       ' ' + this.cartService.getCart().orderDate.toLocaleTimeString() + ' MODIFIEE' , style: 'subheader'},
+
+                // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
+                /* {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' ' + this.cartService.getCart().orderDate.toLocaleDateString() +
+                       ' ' + this.cartService.getCart().orderDate.toLocaleTimeString() + ' MODIFIEE' , style: 'subheader'},*/
+                {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' ' +
+                ' ' + this.cartService.getCart().orderDate + ' MODIFIEE' , style: 'subheader'},     
                 {text: 'Ref client : ' + this.userService.getActiveCustomer().CT_Num},
                 {text: this.userService.getActiveCustomer().CT_Intitule},
                 {text: this.userService.getActiveCustomer().CT_Adresse},
@@ -293,4 +301,5 @@ export class OrderValidationPage implements OnInit {
         this.onDismiss();
         console.log("Delete effectué");
     }
+
 }

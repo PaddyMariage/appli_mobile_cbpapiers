@@ -9,8 +9,9 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class OrderService {
     private order: Order;
-    private orders: Order[] = [];
+    private ordersActive: Order[] = [];
     public order$ : BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
+    public ordersActive$ : BehaviorSubject<Order[]> = new BehaviorSubject<Order[]>(null);
 
     constructor(private dataStorage : Storage,
                 private userService : UserService) {
@@ -26,68 +27,95 @@ export class OrderService {
         return this.order;
     }
 
-    getOrders(): Order[] {
-        return this.orders;
+    getActiveOrders(): Order[] {
+        return this.ordersActive;
+    }
+
+    setActiveOrders(orders: Order[]) {
+        this.ordersActive$.next(orders);
+        this.ordersActive = orders;
+    }
+
+    deleteOrder(order : Order) {
+        let ordersTotal : Order[];
+        this.dataStorage.get('orders').then((orders) => {
+            ordersTotal = JSON.parse(orders);
+            let i = ordersTotal.indexOf(order);
+            ordersTotal.splice(i, 1);
+        }).then(() => {
+            this.dataStorage.set('orders', JSON.stringify(ordersTotal));
+            this.initAndGetOrdersStorage();
+        });
     }
 
     isOrdersStorageEmpty() : Promise<boolean> {
         return this.dataStorage.ready().then(() => {
             return this.dataStorage.get('orders').then((val) => {
                 let valueArray : Order[] = JSON.parse(val);
-                // Si c'est faux c'est vide, sinon il y a une commande
-                if (valueArray.length != 0) {
-                    return false;
+                console.log(valueArray);
+                // Todo : même si c'est null ça rend false, savoir pourquoi
+                // Si c'est faux il y au moins une commande, sinon c'est vide
+                if (valueArray == null || valueArray == []) {
+                    return true;
                 }
                 else
-                    return true;
+                    return false;
             }) 
         })
     }
 
     // Permet d'initialiser la liste d'historique à partir du storage et renvoie les commmandes appartenant à un compte.
-    initAndGetOrdersStorage() : Promise<Order[]> {
-        this.orders = [];
-        return this.dataStorage.ready().then(() => {
-            return this.dataStorage.get('orders').then((orders) => {
+    initAndGetOrdersStorage(){
+        this.ordersActive = [];
+        this.dataStorage.ready().then(() => {
+            this.dataStorage.get('orders').then((orders) => {
                 let ordersTotal : Order[] = JSON.parse(orders);
-                let ordersAcc : Order[] = [];
-                let account = this.userService.getActiveCustomer();
+                let ordersAccount : Order[] = [];
+                let activeAccount = this.userService.getActiveCustomer();
                 ordersTotal.forEach((order) => {
-                    if (order.customer.CT_Num == account.CT_Num) {
-                        ordersAcc.push(order);
+                    if (order.customer.CT_Num == activeAccount.CT_Num) {
+                        ordersAccount.push(order);
                     }
-                })
-                this.orders = ordersAcc ;
-                return ordersAcc;
+                });
+                this.setActiveOrders(ordersAccount);
             });
         });
         
     }
 
-    setOrders(orders: Order[]) {
-        this.orders = orders;
-    }
-
-    // Ajoute la commande au tableau de commande et ajoute ce même tableau au local storage
+    // Vérifie si c'est vide, si c'est le cas on ajoute simplement. Si non, on recupere d'abord le tableau puis on add
     addOrder(order) {
-        this.orders.push(order);
-        console.log(this.orders.length);
-        this.dataStorage.set('orders', JSON.stringify(this.orders));
+        this.isOrdersStorageEmpty().then((boolean) => {
+            if (!boolean) {
+                let totalOrders : Order[];
+                this.dataStorage.get('orders').then((valOrders) => {
+                    totalOrders = JSON.parse(valOrders);
+                    totalOrders.push(order);
+                }).then(() => {
+                    this.dataStorage.set('orders', JSON.stringify(totalOrders)).then(() => {
+                        this.initAndGetOrdersStorage();
+                    });
+                })
+            } else {
+                this.ordersActive.push(order);
+                this.dataStorage.set('orders', JSON.stringify(this.ordersActive));
+            }
+        })
+        
     }
 
     editOrderStorage(order : Order) {
-        // je récupérere le tableau de commande et je cherche l'inx de l'objet qui a le même numéro de commande qu'order
+        // je récupérere le tableau de commande et je cherche l'index de l'objet qui a le même numéro de commande qu'order
         this.dataStorage.get('orders').then((orders) => {
             let ordersTotal : Order[] = JSON.parse(orders);
             let i;
             ordersTotal.forEach((orderArray) => {
                 if (order.orderNumber == orderArray.orderNumber)
                     i = ordersTotal.indexOf(orderArray);
-                    console.log("Trouvé " + order.orderNumber);
             });
             // On supprime un élément à l'index i, puis on ajoute l'objet order a sa place
-            ordersTotal.splice(i, 1);
-            ordersTotal.push(order);
+            ordersTotal.splice(i, 1, order);
+
             // je réattribue le tableau avec l'objet modifié et je relance l'initialisation d'orders
             this.dataStorage.set('orders', JSON.stringify(ordersTotal)).then(() => {
                 this.initAndGetOrdersStorage();
@@ -96,9 +124,11 @@ export class OrderService {
         });
     }
 
+    /* Plus utile ?
     editOrder(order) {
         const objIndex = this.orders.findIndex((obj => obj.orderNumber == order.orderNumber));
         this.orders[objIndex] = order;
     }
+    */
 }
 
