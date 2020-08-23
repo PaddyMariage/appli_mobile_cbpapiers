@@ -7,6 +7,7 @@ import {CartService} from '../../services/cart.service';
 import {ArticleService} from '../../services/article.service';
 import {Order} from "../../models/Order";
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
+import {Storage} from "@ionic/storage";
 
 @Component({
     selector: 'app-articles',
@@ -25,7 +26,8 @@ export class ArticlePage implements OnInit {
     constructor(private modalController: ModalController,
                 private cartService: CartService,
                 private userService: UserService,
-                private articleService: ArticleService) {
+                private articleService: ArticleService,
+                private storage : Storage) {
     }
 
     ngOnInit(): void {

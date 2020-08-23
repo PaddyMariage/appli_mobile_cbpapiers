@@ -16,6 +16,7 @@ import {OrderService} from '../../services/order.service';
 import {Order} from '../../models/Order';
 import { cloneDeep } from 'lodash';
 import {GenerateIDService} from '../../services/generate-id.service';
+import {Storage} from "@ionic/storage";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -40,7 +41,8 @@ export class OrderValidationPage implements OnInit {
                 private userService: UserService,
                 private orderService: OrderService,
                 private modalController: ModalController,
-                private generateIdService: GenerateIDService) {
+                private generateIdService: GenerateIDService,
+                private storage : Storage) {
     }
 
     ngOnInit() {
@@ -83,16 +85,18 @@ export class OrderValidationPage implements OnInit {
 
     checkEditOrderOrNot(){
         if (this.order.orderNumber == null){
+            console.log("Commande non présente");
             this.order =
                 {
                     // numéro de commande généré dans le service generateID
                     orderNumber: this.generateIdService.generate(),
                     orderDate: new Date(),
                     customer : this.userService.getActiveCustomer(),
-                    orderLines: this.cartService.getCart().orderLines
+                    orderLines: this.cartService.getCart().orderLines,
                 };
             this.sendPdf();
         } else {
+            console.log("Commande déjà présente");
             this.order = this.cartService.getCart();
             this.sendPdfEdit();
         }
@@ -100,12 +104,14 @@ export class OrderValidationPage implements OnInit {
 
     sendPdf() {
         // enregistrement de la commande réalisée dans le tableau des commandes de orderService
-        const docDefinition = {
+        let docDefinition = {
             content: [
                 {text: 'CBPAPIERS', style: 'header'},
                 // impression de la date au format dd/mm/yyyy hh'h'mm
                 {
-                    text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
+                    //text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    text : new Date() + ' ',
                     alignment: 'right'
                 },
                 {text: 'Commande : ', style: 'subheader'},
@@ -168,12 +174,18 @@ export class OrderValidationPage implements OnInit {
                 {text: 'CBPAPIERS', style: 'header'},
                 // impression de la date au format dd/mm/yyyy hh'h'mm
                 {
-                    text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
+                    // text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    text : new Date() + ' ',
                     alignment: 'right'
                 },
                 // tslint:disable-next-line:max-line-length
-                {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' ' + this.cartService.getCart().orderDate.toLocaleDateString() +
-                       ' ' + this.cartService.getCart().orderDate.toLocaleTimeString() + ' MODIFIEE' , style: 'subheader'},
+
+                // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
+                /* {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' ' + this.cartService.getCart().orderDate.toLocaleDateString() +
+                       ' ' + this.cartService.getCart().orderDate.toLocaleTimeString() + ' MODIFIEE' , style: 'subheader'},*/
+                {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' ' +
+                ' ' + this.cartService.getCart().orderDate + ' MODIFIEE' , style: 'subheader'},     
                 {text: 'Ref client : ' + this.userService.getActiveCustomer().CT_Num},
                 {text: this.userService.getActiveCustomer().CT_Intitule},
                 {text: this.userService.getActiveCustomer().CT_Adresse},
@@ -224,7 +236,8 @@ export class OrderValidationPage implements OnInit {
         // on fait un clone de la commande
         // on envoie ce clone pour modification de la commande déjà existante avec le même numéro de commande
         const ORDER_HISTORY = cloneDeep(this.order);
-        this.orderService.editOrder(ORDER_HISTORY);
+        this.orderService.editOrderStorage(ORDER_HISTORY);
+        // this.orderService.editOrder(ORDER_HISTORY);
 
 
         // on reinitialise les orderlines de panier pour le remettre à 0
@@ -286,5 +299,7 @@ export class OrderValidationPage implements OnInit {
         this.cartService.resetCart();
         this.warehouseRetService.setStatus(false);
         this.onDismiss();
+        console.log("Delete effectué");
     }
+
 }

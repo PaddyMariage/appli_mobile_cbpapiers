@@ -9,7 +9,8 @@
     <span *ngIf="order.isCancelled" class="cancel">
         ANNULEE &nbsp; 
     </span>
-          {{order.orderNumber| uppercase}} {{order.orderDate.toLocaleDateString()}}
+        <!--{{order.orderNumber| uppercase}} {{order.orderDate.toLocaleDateString }} -->
+          {{order.orderNumber| uppercase}} {{order.orderDate | date }}
       </ion-item>
   </ion-list>
 </ion-content>
