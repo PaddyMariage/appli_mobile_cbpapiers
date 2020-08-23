@@ -151,7 +151,7 @@ export class UserService {
                         console.log(login, password);
                         console.log('data', data);
                         if (data.CT_Num.toLowerCase() == login.toLowerCase()
-                            && (data.MDP.toLowerCase() == password.toLowerCase() || this.isAdmin()))
+                            && (data.MDP== password || this.isAdmin()))
                             resolve(data);
                         else
                             reject('Mauvais identifiants');
