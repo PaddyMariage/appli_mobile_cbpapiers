@@ -195,7 +195,7 @@ export class UserService {
         // });
     }
 
-    private isAdmin() {
+    isAdmin() {
         let index = 0;
         let admin = false;
         while(!admin && index < this.customerAccounts.length){

@@ -42,6 +42,7 @@
     "cordova-res": "^0.15.1",
     "cordova-sqlite-storage": "^5.0.1",
     "js-sha256": "^0.9.0",
+    "mx.ferreyra.callnumber": "0.0.2",
     "pdfmake": "^0.1.68",
     "rxjs": "~6.5.1",
     "tslib": "^1.10.0",
@@ -96,7 +97,8 @@
         "ANDROID_SUPPORT_V4_VERSION": "27.+"
       },
       "cordova-plugin-file": {},
-      "cordova-plugin-advanced-http": {}
+      "cordova-plugin-advanced-http": {},
+      "call-number": {}
     },
     "platforms": [
       "android",

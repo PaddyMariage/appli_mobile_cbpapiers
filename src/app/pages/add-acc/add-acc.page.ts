@@ -29,7 +29,7 @@ export class AddAccPage implements OnInit {
                 this.error = 'Veuillez entrer un identifiant & mot de passe';
             else
                 this.error = 'Veuillez entrer un identifiant';
-        else if(this.password == '' || this.password == null)
+        else if((this.password == '' || this.password == null) && !this.userService.isAdmin())
             this.error = 'Veuillez entrer un mot de passe';
         else {
             await this.userService.getUserValidity(this.login, this.password).then((account:F_COMPTET) => {
