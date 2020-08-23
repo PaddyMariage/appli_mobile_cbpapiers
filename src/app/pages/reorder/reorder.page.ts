@@ -37,9 +37,9 @@ export class ReorderPage implements OnInit {
         // Si le toggle est activé on applique la remise
         this.total = 0;
         if (!this.warehouseRetrieval)
-            this.order.orderLines.forEach(value => this.total += (value.article.finalPrice * value.quantity));
+            this.order.orderLines.forEach(value => this.total += (value.article.unitPrice * value.quantity));
         else
-            this.order.orderLines.forEach(value => this.total += ((value.article.finalPrice * value.quantity) * 0.95));
+            this.order.orderLines.forEach(value => this.total += ((value.article.unitPrice * value.quantity) * 0.95));
         if (this.total < 250 && !this.warehouseRetrieval)
             this.total += 20;
     }
