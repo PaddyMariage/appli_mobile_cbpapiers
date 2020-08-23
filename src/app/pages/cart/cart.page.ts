@@ -14,7 +14,7 @@ import {Order} from '../../models/Order';
     templateUrl: './cart.page.html',
     styleUrls: ['./cart.page.scss'],
 })
-// dans le cas d'un "can't bind" to ngFor", ajouter CartPage à app.module.ts dans declarations & entryComponents
+// dans le cas d'un "can't bind" to ngFor", ajouter CartPage au module qui la déclare dans declarations & entryComponents
 export class CartPage implements OnInit, OnDestroy {
 
     possibleQuantities: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
