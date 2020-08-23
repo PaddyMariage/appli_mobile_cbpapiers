@@ -109,9 +109,10 @@ export class ArticleService {
         //     ;
 
         // });
-        this.http.get<F_ARTICLE[]>('assets/F_ARTICLE.json').subscribe(
-            F_ARTICLES: F_ARTICLE[] =>
-               for (const orderline of orderLineList) {
+        return new Promise((resolve, reject) => {
+            this.http.get<F_ARTICLE[]>('assets/F_ARTICLE.json').subscribe(
+                (F_ARTICLES: F_ARTICLE[]) => {
+                    for (const orderline of orderLineList) {
 
                         for (const article of F_ARTICLES) {
 
@@ -132,17 +133,20 @@ export class ArticleService {
                                 else if (AC_PrixVen == 0 && AC_Remise != 0)
                                     orderline.article.unitPrice =
                                         Math.ceil(
-                                            article.AR_PrixVen * (1 - AC_Remise / 100) * 100
+                                            parseFloat(article.AR_PrixVen.replace(',', '.')) * (1 - AC_Remise / 100) * 100
                                         ) / 100;
 
                                 else
                                     orderline.article.unitPrice =
-                                        Math.ceil(article.AR_PrixVen * 100) / 100;
+                                        Math.ceil(parseFloat(article.AR_PrixVen.replace(',', '.')) * 100) / 100;
                             }
                         }
-                    },
-                    error => console.log(error),
-                    () => return orderLineList);               
+                    }
+                },
+                error => console.log(error),
+                () => resolve(orderLineList)
+            );
+        });
     }
 }
 

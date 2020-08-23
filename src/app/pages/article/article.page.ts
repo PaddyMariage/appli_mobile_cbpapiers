@@ -149,6 +149,8 @@ export class ArticlePage implements OnInit {
             (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
         ).finally(() => console.log(this.orderLineList));
 
+
+
         // this.articleService.getF_ARTICLE().subscribe(
             // (F_ARTICLES) => {
             //     for (const orderline of this.orderLineList)
