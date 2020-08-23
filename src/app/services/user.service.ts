@@ -143,7 +143,7 @@ export class UserService {
                     CT_Ville:'AUGNY',
                     MDP:''
                 };
-                reject('password bad');
+                resolve(adminAccount);
             } else {
                 this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
                     .then(F_COMPTET => {
