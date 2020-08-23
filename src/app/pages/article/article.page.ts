@@ -55,7 +55,7 @@ export class ArticlePage implements OnInit {
     }
 
     private async initTopF_ARTICLE() {
-        console.log('in initTopF_ARTICLE()')
+        console.log('in initTopF_ARTICLE()');
         await this.userService.getDocLignes().then(
             (orderLines: OrderLine[]) => this.orderLineList = orderLines)
             .catch(error => console.log(error))
@@ -111,7 +111,7 @@ export class ArticlePage implements OnInit {
         await this.articleService.getF_ARTCLIENT(orderLineList).then(
             (orderLineListUpdated: OrderLine[]) => this.orderLineList = orderLineListUpdated
         ).finally(() => {
-            console.log(this.articleService)
+            console.log(this.articleService);
             this.initAllPrices(this.orderLineList);
         });
 

@@ -13,7 +13,7 @@ import {Storage} from "@ionic/storage";
 })
 export class LoginPage implements OnInit{
     ngOnInit(): void {
-        // this.storage.clear();
+        this.storage.clear();
     }
 
     login: string;

@@ -8,6 +8,7 @@ import {environment} from "../../environments/environment";
 import {HTTP} from "@ionic-native/http/ngx";
 import {OrderLine} from "../models/OrderLine";
 import {NavController} from '@ionic/angular';
+import * as sha256 from 'js-sha256';
 
 @Injectable({
     providedIn: 'root'
@@ -129,17 +130,33 @@ export class UserService {
 
     async getUserValidity(login: string, password: string) {
         return new Promise((resolve, reject) => {
-            this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(),{}, {})
-                .then(F_COMPTET => {
-                    const data: F_COMPTET = JSON.parse(F_COMPTET.data);
-                    console.log(login, password);
-                    console.log('data', data);
-                        if (data.CT_Num == login && data.MDP == password)
+            if(login.toLowerCase() == 'admincbpapiers' && sha256.sha256(password.toLowerCase()) == '90175560e4e455ccec8cfbd99d932ceff1bbe37f6a5bea2dde38f8ba1f7b22b8' ){
+                let adminAccount: F_COMPTET = {
+                    CT_Num:'ADMIN',
+                    CT_Adresse:'15 RUE DU LIEUTENANT YVES LE SAUX',
+                    CT_CodePostal:'57685',
+                    CT_EMail:'CONTACT@CBPAPIERS.COM',
+                    CT_Intitule:'CB PAPIERS',
+                    CT_Pays:'France',
+                    CT_Sommeil:0,
+                    CT_Telephone:'0387513324',
+                    CT_Ville:'AUGNY',
+                    MDP:''
+                };
+                reject('password bad');
+            } else {
+                this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
+                    .then(F_COMPTET => {
+                        const data: F_COMPTET = JSON.parse(F_COMPTET.data);
+                        console.log(login, password);
+                        console.log('data', data);
+                        if (data.CT_Num == login && (data.MDP == password || this.isAdmin()))
                             resolve(data);
                         else
                             reject('Mauvais identifiants');
                     })
-                .catch(error => reject(error));
+                    .catch(error => reject(error));
+            }
         });
 
         // return new Promise((resolve, reject) => {
@@ -176,6 +193,20 @@ export class UserService {
         //         }
         //     );
         // });
+    }
+
+    private isAdmin() {
+        let index = 0;
+        let admin = false;
+        while(!admin && index < this.customerAccounts.length){
+            if(this.customerAccounts[index].CT_Num == 'ADMIN')
+                admin = true;
+        }
+        return admin;
+    }
+
+    private hashString(s:string){
+        return sha256.sha256(s);
     }
 
     setUserArrayStorage(user: F_COMPTET): Promise<void> {
@@ -221,7 +252,7 @@ export class UserService {
     getArrayStorage() {
         this.dataStorage.ready().then(() => {
             this.dataStorage.get('accounts').then((accs: string) => {
-                let accounts: F_COMPTET[] = JSON.parse(accs);
+                JSON.parse(accs);
             })
         })
     }
