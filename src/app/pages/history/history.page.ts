@@ -16,7 +16,6 @@ export class HistoryPage implements OnInit {
 
     constructor(private orderService: OrderService,
                 private userService : UserService) {
-        
     }
 
     ngOnInit() {
@@ -37,16 +36,12 @@ export class HistoryPage implements OnInit {
                         if (!boolean) 
                             this.orderService.initAndGetOrdersStorage()
                     });
-                       
                 }
             });
     }
 
-
-
     onClickOrder(order: Order) {
         this.orderService.setOrder(order);
     }
-
 
 }

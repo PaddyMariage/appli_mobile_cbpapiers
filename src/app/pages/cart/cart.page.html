@@ -34,7 +34,7 @@
                 {{orderLine.article.label | slice:0:20 }}
             </span>
             <span class="align">
-            {{orderLine.article.unitPrice}} €
+            {{orderLine.article.unitPrice | number:'1.2-2'}} €
             </span>
             <ion-select (ionChange)="updateCart($event,orderLine)"
                         interface="popover" slot="end"

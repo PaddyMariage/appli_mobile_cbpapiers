@@ -119,4 +119,5 @@
     <plugin name="cordova-plugin-advanced-http" spec="^3.0.1" />
     <allow-navigation href="http://localhost:8100" sessionid="b2c35f78" />
     <engine name="android" spec="8.1.0" />
+    <allow-navigation href="http://localhost:8100" sessionid="f3360f0d" />
 </widget>

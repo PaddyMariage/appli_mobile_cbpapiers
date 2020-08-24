@@ -33,6 +33,7 @@
     "@ionic/storage": "^2.3.0",
     "call-number": "^1.0.1",
     "cordova-android": "8.1.0",
+    "cordova-ios": "5.1.1",
     "cordova-pdf-generator": "^2.1.1",
     "cordova-plugin-advanced-http": "^3.0.1",
     "cordova-plugin-app-preferences": "^0.99.3",
