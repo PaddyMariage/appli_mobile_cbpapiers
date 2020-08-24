@@ -12,9 +12,6 @@ import {Storage} from "@ionic/storage";
     styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit{
-    ngOnInit(): void {
-        this.storage.clear();
-    }
 
     login: string;
     password: string;
@@ -41,7 +38,7 @@ export class LoginPage implements OnInit{
                     });
                 });
             });
-        })
+        });
 
 
         // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
@@ -52,6 +49,10 @@ export class LoginPage implements OnInit{
                     this.router.navigateByUrl('/nav/article');
             }
         });
+    }
+
+    ngOnInit(): void {
+        // this.storage.clear();
     }
 
 

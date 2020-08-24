@@ -77,10 +77,12 @@ export class OrderService {
                         ordersAccount.push(order);
                     }
                 });
+                ordersAccount.sort((a,b) => (new Date(b.orderDate).valueOf() - new Date(a.orderDate).valueOf()));
+                console.log(ordersAccount);
                 this.setActiveOrders(ordersAccount);
             });
         });
-        
+
     }
 
     // Vérifie si c'est vide, si c'est le cas on ajoute simplement. Si non, on recupere d'abord le tableau puis on add
