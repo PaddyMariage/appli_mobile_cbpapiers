@@ -81,6 +81,7 @@ export class UserService {
     getDocLignes() {
         // todo remplacer par l'appel à l'api
         let articlesAndFrequency: [string, string, number][] = [];
+
         let AR_Ref_Array: string[] = [];
         const ctNum = this.activeCustomer.CT_Num;
         let orderLines: OrderLine[] = [];

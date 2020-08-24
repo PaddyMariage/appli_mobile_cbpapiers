@@ -60,7 +60,7 @@ export class ArticlePage implements OnInit {
             (orderLines: OrderLine[]) => this.orderLineList = orderLines)
             .catch(error => console.log(error))
             .finally(() => {
-                console.log(this.orderLineList)
+                console.log(this.orderLineList);
                 this.initAllInfos(this.orderLineList)
             });
 
@@ -107,11 +107,10 @@ export class ArticlePage implements OnInit {
     }
 
     private async initAllInfos(orderLineList: OrderLine[]) {
-        console.log('in initAllInfos()')
+        console.log('in initAllInfos()');
         await this.articleService.getF_ARTCLIENT(orderLineList).then(
-            (orderLineListUpdated: OrderLine[]) => this.orderLineList = orderLineListUpdated
+            (orderLineList_Updated: OrderLine[]) => this.orderLineList = orderLineList_Updated
         ).finally(() => {
-            console.log(this.articleService);
             this.initAllPrices(this.orderLineList);
         });
 
@@ -144,7 +143,7 @@ export class ArticlePage implements OnInit {
     }
 
     private async initAllPrices(orderLineList: OrderLine[]) {
-        console.log('in initAllPrices()')
+        console.log('in initAllPrices()');
         await this.articleService.getF_ARTICLE(orderLineList).then(
             (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
         ).finally(() => console.log(this.orderLineList));

@@ -24,7 +24,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export class SingleOrderPage implements OnInit {
 
     order: Order;
-    orders : Order[] = []
+    orders : Order[] = [];
     total = 0;
     canEdit: boolean;
     pdfObj = null;
@@ -253,12 +253,12 @@ export class SingleOrderPage implements OnInit {
                     .duration(300)
                     .beforeAddClass('show-modal')
                     .addAnimation([backdropAnimation, wrapperAnimation]);
-            }
+            };
 
             // pour l'animation de retour, on joue simplement l'inverse de l'animation d'entrée
             const leaveAnimation = (baseEl: any) => {
                 return enterAnimation(baseEl).direction('reverse');
-            }
+            };
             // Création du modal avec les animations et les css défini
             const modal = await this.modalController.create({
                 component: ContactPage,

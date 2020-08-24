@@ -7,6 +7,7 @@ import {F_ARTCLIENT} from '../models/JSON/F_ARTCLIENT';
 import {HTTP} from "@ionic-native/http/ngx";
 import {environment} from "../../environments/environment";
 import {OrderLine} from "../models/OrderLine";
+import {CartService} from "./cart.service";
 
 @Injectable({
     providedIn: 'root'
@@ -17,7 +18,7 @@ export class ArticleService {
     public articles$: BehaviorSubject<F_ARTICLE[]> = new BehaviorSubject<F_ARTICLE[]>([]);
     public articlePrice$: BehaviorSubject<F_ARTCLIENT[]> = new BehaviorSubject<F_ARTCLIENT[]>([]);
 
-    constructor(private http: HttpClient, private ionicHttp: HTTP) {
+    constructor(private http: HttpClient, private ionicHttp: HTTP, private cartService: CartService) {
     }
 
     setArticle(article: Article) {
@@ -41,6 +42,7 @@ export class ArticleService {
 
                                 const AC_PrixVen = discount.AC_PrixVen;
                                 const AC_Remise = discount.AC_Remise;
+
                                 if (AC_PrixVen != 0 && AC_Remise != 0) {
                                     orderLine.article.AC_PrixVen = AC_PrixVen;
                                     orderLine.article.AC_Remise = AC_Remise;
@@ -71,29 +73,29 @@ export class ArticleService {
         //             const data = JSON.parse(F_ARTICLE.data);
         //             console.log('articles?', data);
         //             for (const orderline of orderLineList) {
-
+        //
         //                 for (const article of data) {
-
+        //
         //                     if (orderline.article.reference == article.AR_Ref.trim()) {
         //                         const AC_PrixVen = orderline.article.AC_PrixVen;
         //                         const AC_Remise = orderline.article.AC_Remise;
-
+        //
         //                         if (AC_PrixVen != 0 && AC_Remise != 0)
         //                             orderline.article.unitPrice =
         //                                 Math.ceil(
         //                                     AC_PrixVen * (1 - AC_Remise / 100) * 100
         //                                 ) / 100;
-
+        //
         //                         else if (AC_PrixVen != 0 && AC_Remise == 0)
         //                             orderline.article.unitPrice =
         //                                 Math.ceil(AC_PrixVen * 100) / 100;
-
+        //
         //                         else if (AC_PrixVen == 0 && AC_Remise != 0)
         //                             orderline.article.unitPrice =
         //                                 Math.ceil(
         //                                     article.AR_PrixVen * (1 - AC_Remise / 100) * 100
         //                                 ) / 100;
-
+        //
         //                         else
         //                             orderline.article.unitPrice =
         //                                 Math.ceil(article.AR_PrixVen * 100) / 100;
@@ -107,7 +109,7 @@ export class ArticleService {
         //         })
         //         .finally(() => resolve(orderLineList))
         //     ;
-
+        //
         // });
         return new Promise((resolve, reject) => {
             this.http.get<F_ARTICLE[]>('assets/F_ARTICLE.json').subscribe(
@@ -144,7 +146,10 @@ export class ArticleService {
                     }
                 },
                 error => console.log(error),
-                () => resolve(orderLineList)
+                () => {
+                    this.cartService.initOrderLinesList(orderLineList);
+                    resolve(orderLineList);
+                }
             );
         });
     }
