@@ -10,6 +10,8 @@ import {FormsModule} from "@angular/forms";
 import {IonicStorageModule} from '@ionic/storage';
 import {HttpClientModule} from '@angular/common/http';
 
+
+
 //imports nécessaires pour générer pdf et créer un mail
 import {File} from '@ionic-native/file/ngx';
 import {FileOpener} from '@ionic-native/file-opener/ngx';

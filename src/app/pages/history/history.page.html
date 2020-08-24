@@ -10,7 +10,7 @@
         ANNULEE &nbsp; 
     </span>
         <!--{{order.orderNumber| uppercase}} {{order.orderDate.toLocaleDateString }} -->
-          {{order.orderNumber| uppercase}} {{order.orderDate | date }}
+          {{order.orderNumber| uppercase}} {{order.orderDate | date: 'dd/MM/yyyy' : 'UTC'}}
       </ion-item>
   </ion-list>
 </ion-content>
