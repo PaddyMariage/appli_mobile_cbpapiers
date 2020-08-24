@@ -104,7 +104,10 @@ export class LoginPage implements OnInit{
             this.error = 'Veuillez entrer un mot de passe';
         else {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
+                console.log('log en cours');
                 this.userService.setUserArrayStorage(account).then(() => {
+                    console.log('redirect');
+                    this.router.navigateByUrl('/nav/article');
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
             }).catch((data:string) => {

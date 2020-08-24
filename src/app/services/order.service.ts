@@ -50,7 +50,7 @@ export class OrderService {
 
     isOrdersStorageEmpty() : Promise<boolean> {
         return this.dataStorage.ready().then(() => {
-            console.log('orders' + + this.userService.getActiveCustomer().CT_Num);
+            console.log('orders' + this.userService.getActiveCustomer().CT_Num);
             
             return this.dataStorage.get('orders' + this.userService.getActiveCustomer().CT_Num).then((val) => {
                 let valueArray : Order[] = JSON.parse(val);
@@ -69,21 +69,15 @@ export class OrderService {
     // Permet d'initialiser la liste d'historique à partir du storage et renvoie les commmandes appartenant à un compte.
     initAndGetOrdersStorage(){
         this.ordersActive = [];
+        console.log('init');
         this.dataStorage.ready().then(() => {
             this.dataStorage.get('orders' + this.userService.getActiveCustomer().CT_Num).then((orders) => {
                 let ordersTotal : Order[] = JSON.parse(orders);
-                let ordersAccount : Order[] = [];
-                let activeAccount = this.userService.getActiveCustomer();
-                ordersTotal.forEach((order) => {
-                    if (order.customer.CT_Num == activeAccount.CT_Num) {
-                        ordersAccount.push(order);
-                    }
-                });
-                ordersAccount.sort((a,b) => (b.orderDate.valueOf() - a.orderDate.valueOf()));
-                this.setActiveOrders(ordersAccount);
+                console.log(ordersTotal);
+                ordersTotal.sort((a,b) => (b.orderDate.valueOf() - a.orderDate.valueOf()));
+                this.setActiveOrders(ordersTotal);
             });
         });
-        
     }
 
     // Vérifie si c'est vide, si c'est le cas on ajoute simplement. Si non, on recupere d'abord le tableau puis on add

@@ -131,9 +131,9 @@ export class UserService {
 
     async getUserValidity(login: string, password: string) {
         return new Promise((resolve, reject) => {
-            if(login.toLowerCase() == 'admincbpapiers' && sha256.sha256(password.toLowerCase()) == '90175560e4e455ccec8cfbd99d932ceff1bbe37f6a5bea2dde38f8ba1f7b22b8' ){
+            if(login.toLowerCase() == 'cbpap' && sha256.sha256(password.toLowerCase()) == '90175560e4e455ccec8cfbd99d932ceff1bbe37f6a5bea2dde38f8ba1f7b22b8' ){
                 let adminAccount: F_COMPTET = {
-                    CT_Num:'ADMIN',
+                    CT_Num:'CBPAP',
                     CT_Adresse:'15 RUE DU LIEUTENANT YVES LE SAUX',
                     CT_CodePostal:'57685',
                     CT_EMail:'CONTACT@CBPAPIERS.COM',
@@ -144,13 +144,16 @@ export class UserService {
                     CT_Ville:'AUGNY',
                     MDP:''
                 };
+                console.log('admin');
                 resolve(adminAccount);
             } else {
+                console.log('ici');
                 this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
                     .then(F_COMPTET => {
                         const data: F_COMPTET = JSON.parse(F_COMPTET.data);
-                        console.log(login, password);
-                        console.log('data', data);
+                        console.log(data);
+                        console.log(this.isAdmin());
+                        console.log(login);
                         if (data.CT_Num.toLowerCase() == login.toLowerCase()
                             && (data.MDP.toLowerCase() == password.toLowerCase() || this.isAdmin()))
                             resolve(data);
