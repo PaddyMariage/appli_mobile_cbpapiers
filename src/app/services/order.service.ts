@@ -50,6 +50,8 @@ export class OrderService {
 
     isOrdersStorageEmpty() : Promise<boolean> {
         return this.dataStorage.ready().then(() => {
+            console.log('orders' + + this.userService.getActiveCustomer().CT_Num);
+            
             return this.dataStorage.get('orders' + this.userService.getActiveCustomer().CT_Num).then((val) => {
                 let valueArray : Order[] = JSON.parse(val);
                 console.log(valueArray);
@@ -77,12 +79,11 @@ export class OrderService {
                         ordersAccount.push(order);
                     }
                 });
-                ordersAccount.sort((a,b) => (new Date(b.orderDate).valueOf() - new Date(a.orderDate).valueOf()));
-                console.log(ordersAccount);
+                ordersAccount.sort((a,b) => (b.orderDate.valueOf() - a.orderDate.valueOf()));
                 this.setActiveOrders(ordersAccount);
             });
         });
-
+        
     }
 
     // Vérifie si c'est vide, si c'est le cas on ajoute simplement. Si non, on recupere d'abord le tableau puis on add
