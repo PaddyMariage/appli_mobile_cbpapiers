@@ -77,6 +77,7 @@ export class OrderService {
                         ordersAccount.push(order);
                     }
                 });
+                ordersAccount.sort((a,b) => (a.orderDate.valueOf() - b.orderDate.valueOf()));
                 this.setActiveOrders(ordersAccount);
             });
         });
