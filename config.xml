@@ -105,5 +105,5 @@
     <engine name="ios" />
     <plugin name="cordova-plugin-advanced-http" spec="^3.0.1" />
     <engine name="android" spec="8.1.0" />
-    <allow-navigation href="http://localhost:8100" sessionid="0ab57eb1" />
+    <allow-navigation href="http://localhost:8100" sessionid="a7f1c1d5" />
 </widget>
