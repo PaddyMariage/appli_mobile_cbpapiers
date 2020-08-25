@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Order} from '../../models/Order';
 import {OrderService} from '../../services/order.service';
 import {AlertController, AnimationController, ModalController, NavController, Platform, ToastController} from '@ionic/angular';
@@ -13,6 +13,7 @@ import {UserService} from '../../services/user.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import {ContactPage} from '../contact/contact.page';
+import {Subscription} from "rxjs";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -21,7 +22,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
     templateUrl: './single-order.page.html',
     styleUrls: ['./single-order.page.scss'],
 })
-export class SingleOrderPage implements OnInit {
+export class SingleOrderPage implements OnInit, OnDestroy {
 
     order: Order;
     orders : Order[] = [];
@@ -29,6 +30,7 @@ export class SingleOrderPage implements OnInit {
     canEdit: boolean;
     pdfObj = null;
     deadline: Date;
+    orderSub: Subscription;
 
     constructor(private orderService: OrderService,
                 private cartService: CartService,
@@ -45,7 +47,7 @@ export class SingleOrderPage implements OnInit {
     }
 
     ngOnInit(): void {
-        this.orderService.order$.subscribe( 
+        this.orderSub = this.orderService.order$.subscribe(
             order => {
                 this.order = order;
                 this.total = 0;
@@ -270,5 +272,9 @@ export class SingleOrderPage implements OnInit {
             // lancement du modal
             return await modal.present();
 
+    }
+
+    ngOnDestroy() {
+        this.orderSub.unsubscribe();
     }
 }

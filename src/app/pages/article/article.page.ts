@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {LoadingController, ModalController} from '@ionic/angular';
 import {SingleArticlePage} from '../single-article/single-article.page';
 import {OrderLine} from 'src/app/models/OrderLine';
@@ -8,13 +8,14 @@ import {ArticleService} from '../../services/article.service';
 import {Order} from "../../models/Order";
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
 import {Storage} from "@ionic/storage";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'app-articles',
     templateUrl: './article.page.html',
     styleUrls: ['./article.page.scss'],
 })
-export class ArticlePage implements OnInit {
+export class ArticlePage implements OnInit, OnDestroy {
 
     possibleQuantities: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
     cart: Order;
@@ -23,31 +24,34 @@ export class ArticlePage implements OnInit {
     totalQuantity: number;
     customer: F_COMPTET;
     loading: HTMLIonLoadingElement;
+    cartSub: Subscription;
+    orderLineSub: Subscription;
+    activeCustomerSub: Subscription;
 
     constructor(private modalController: ModalController,
                 private cartService: CartService,
                 private userService: UserService,
                 private articleService: ArticleService,
-                private storage : Storage,
+                private storage: Storage,
                 private loadingController: LoadingController) {
     }
 
     ngOnInit(): void {
-        this.cartService.cart$.subscribe(data => {
+        this.cartSub = this.cartService.cart$.subscribe(data => {
             this.cart = data;
             this.totalQuantity = data.orderLines.length;
         });
 
-        this.cartService.orderLineList$.subscribe(
+        this.orderLineSub = this.cartService.orderLineList$.subscribe(
             (liste) => {
                 this.orderLineList = liste;
             }
         );
 
-        this.userService.activeCustomer$.subscribe(
+        this.activeCustomerSub = this.userService.activeCustomer$.subscribe(
             customer => {
                 // on ne refresh pas si c'est déjà celui présent dans la page
-                if(this.customer == null || this.customer.CT_Num != customer.CT_Num) {
+                if (this.customer == null || this.customer.CT_Num != customer.CT_Num) {
                     this.orderLineList = [];
                     this.customer = customer;
                     this.initTopF_ARTICLE();
@@ -73,7 +77,8 @@ export class ArticlePage implements OnInit {
 
     private async initTopF_ARTICLE() {
         await this.articleService.getDocLignes(this.customer.CT_Num).then(
-            (orderLines: OrderLine[]) => this.orderLineList = orderLines)
+            (orderLines: OrderLine[]) => this.cartService.initOrderLinesList(orderLines)
+        )
             .catch(error => console.log(error))
             .finally(() => {
                 console.log(this.orderLineList);
@@ -174,6 +179,12 @@ export class ArticlePage implements OnInit {
 
         // on met à jour le nouveau panier dans le service
         this.cartService.setCart(this.cart);
+    }
+
+    ngOnDestroy() {
+        this.cartSub.unsubscribe();
+        this.orderLineSub.unsubscribe();
+        this.activeCustomerSub.unsubscribe();
     }
 }
 

@@ -115,6 +115,7 @@ export class ArticleService {
 
     getF_ARTICLE(orderLineList: OrderLine[]) {
 
+        let orderLineList_Final: OrderLine[] = [];
         return new Promise((resolve) => {
             this.ionicHttp.get(environment.articlesURL, {}, {})
                 .then((F_ARTICLE) => {
@@ -122,7 +123,7 @@ export class ArticleService {
 
                     for (const orderline of orderLineList) {
 
-                        for (const article of data) {
+                    for (const article of data) {
 
                             if (orderline.article.reference == article.AR_Ref.trim()) {
                                 const AC_PrixVen = orderline.article.AC_PrixVen;
@@ -148,9 +149,15 @@ export class ArticleService {
                                     orderline.article.unitPrice =
                                         Math.ceil(article.AR_PrixVen * 100) / 100;
                                 orderline.article.label = article.AR_Design;
+
                             }
                         }
                     }
+                    orderLineList.forEach(
+                        orderLine => {
+                            if (orderLine.article.label == null)
+                                orderLineList.splice(orderLineList.indexOf(orderLine), 1)
+                        });
                 })
                 .catch(error => {
                     console.log('oops');
