@@ -78,57 +78,6 @@ export class UserService {
         return this.http.get<F_COMPTET[]>('assets/F_COMPTET.json');
     }
 
-    getDocLignes() {
-        // todo remplacer par l'appel à l'api
-        let articlesAndFrequency: [string, string, number][] = [];
-
-        let AR_Ref_Array: string[] = [];
-        const ctNum = this.activeCustomer.CT_Num;
-        let orderLines: OrderLine[] = [];
-        return new Promise((resolve, reject) => {
-            this.ionicHttp.get(environment.doclignesURL, {}, {})
-                .then(F_DOCLIGNE => {
-                    const data: F_DOCLIGNE[] = JSON.parse(F_DOCLIGNE.data);
-                        data.forEach(
-                            (DOCLIGNE) => {
-                                if (DOCLIGNE.AR_Ref.trim() != '')
-
-                                    if (AR_Ref_Array.indexOf(DOCLIGNE.AR_Ref.trim()) != -1)
-                                        articlesAndFrequency[AR_Ref_Array.indexOf(DOCLIGNE.AR_Ref.trim())][2]++;
-
-                                    else {
-                                        AR_Ref_Array.push(DOCLIGNE.AR_Ref.trim());
-                                        articlesAndFrequency.push([DOCLIGNE.AR_Ref.trim(), DOCLIGNE.DL_Design, 1]);
-                                    }
-                            }
-                        );
-                        articlesAndFrequency.sort((a, b) => (b[2] - a[2]));
-                        articlesAndFrequency.forEach(
-                            data => {
-                                const orderLine = {
-                                    article: {
-                                        reference: data[0],
-                                        label: data[1],
-                                        AC_PrixVen: 0,
-                                        AC_Remise: 0
-                                    },
-                                    quantity: 0,
-                                    orderNumber: null,
-                                };
-                                orderLines.push(orderLine);
-                            }
-                        );
-                        resolve(orderLines);
-                })
-                .catch(error => {
-                    console.log(error);
-                    reject(error);
-                });
-
-        });
-    }
-
-
     async getUserValidity(login: string, password: string) {
         return new Promise((resolve, reject) => {
             if(login.toLowerCase() == 'cbpap' && sha256.sha256(password.toLowerCase()) == '90175560e4e455ccec8cfbd99d932ceff1bbe37f6a5bea2dde38f8ba1f7b22b8' ){
@@ -147,57 +96,21 @@ export class UserService {
                 console.log('admin');
                 resolve(adminAccount);
             } else {
-                console.log('ici');
                 this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
                     .then(F_COMPTET => {
                         const data: F_COMPTET = JSON.parse(F_COMPTET.data);
-                        console.log(data);
-                        console.log(this.isAdmin());
-                        console.log(login);
                         if (data.CT_Num.toLowerCase() == login.toLowerCase()
-                            && (data.MDP.toLowerCase() == password.toLowerCase() || this.isAdmin()))
+                            && (data.MDP.toLowerCase() == password.toLowerCase() || this.isAdmin())) {
+                            this.activeCustomer$.next(data);
+                            this.activeCustomer = data;
                             resolve(data);
+                        }
                         else
                             reject('Mauvais identifiants');
                     })
                     .catch(error => reject(error));
             }
         });
-
-        // return new Promise((resolve, reject) => {
-        //     this.http.get<F_COMPTET>(environment.baseLoginURL + login.toUpperCase())
-        //         .subscribe(F_COMPTET => {
-        //
-        //             if (F_COMPTET.CT_Num == login && F_COMPTET.MDP == password)
-        //                 resolve(F_COMPTET);
-        //             else
-        //                 reject('Mauvais identifiants');
-        //         },
-        //         error => reject('error')
-        //         );
-        // });
-
-        // let F_Comptet = null;
-        // return new Promise((resolve, reject) => {
-        //     this.getAllF_COMPTETs().subscribe(
-        //         (F_COMPTETs) => {
-        //             let found = false;
-        //             let index = 0;
-        //             while (!found && index < F_COMPTETs.length) {
-        //                 if (F_COMPTETs[index].CT_Num.toUpperCase() == login.toUpperCase() && password == F_COMPTETs[index].MDP) {
-        //                     found = true;
-        //                     F_Comptet = F_COMPTETs[index];
-        //                 } else {
-        //                     index++;
-        //                 }
-        //             }
-        //             if (found)
-        //                 resolve(F_Comptet);
-        //             else
-        //                 reject('Mauvais identifiant/mot de passe');
-        //         }
-        //     );
-        // });
     }
 
     isAdmin() {

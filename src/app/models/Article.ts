@@ -4,7 +4,7 @@ import { ArticleDetails } from './ArticleDetails';
 export class Article {
 
   reference: string;
-  label: string;
+  label?: string;
   unitPrice?: number;
   articleImage?: ArticlePicture;
   articleDetails?: ArticleDetails;
