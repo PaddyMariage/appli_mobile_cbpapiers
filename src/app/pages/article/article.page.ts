@@ -109,7 +109,10 @@ export class ArticlePage implements OnInit, OnDestroy {
         }
 
         // on l'envoie à l'observable pour que la page se mette à jour
-        this.cartService.setOrderLineList(orderLines);
+        // la raison pour laquelle la quantité ne revient pas à 0 est probablement dûe
+        // au fait que le select est initialité à la création de la page
+        // et modifié seulement si ionChange est appelé dans le template
+        this.cartService.filterOrderLineList(orderLines);
     }
 
     async createOrderLineDetails(orderLine: OrderLine) {
@@ -126,9 +129,7 @@ export class ArticlePage implements OnInit, OnDestroy {
 
     }
 
-
-    // retourne un backup d'orderLineList générée en initialisation de page.
-
+    // Dés qu'une quantité est selectionnée pour un article, la méthode met à jour le panier et envoie l'information au cartservice
     // on interprète le fait que c'est une suppression ou un ajout ou une mise à jour
     onChangeOrderLine($event: any, orderLine: OrderLine) {
 

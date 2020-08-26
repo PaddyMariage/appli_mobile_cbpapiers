@@ -104,6 +104,9 @@ export class CartService {
         this.orderLineList$.next(this.orderLineList);
     }
 
+    filterOrderLineList(orderLinesFiltered: OrderLine[]) {
+        this.orderLineList$.next(orderLinesFiltered);
+    }
     // remise à 0 des quantités dans la liste d'article
     resetQuantityOfOrderLineList() {
         this.orderLineList.forEach(orderLine => orderLine.quantity = 0);
