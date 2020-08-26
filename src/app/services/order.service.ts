@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Order} from "../models/Order";
 import {Storage} from "@ionic/storage";
-import { UserService } from './user.service';
-import { BehaviorSubject } from 'rxjs';
+import {UserService} from './user.service';
+import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -10,11 +10,11 @@ import { BehaviorSubject } from 'rxjs';
 export class OrderService {
     private order: Order;
     private ordersActive: Order[] = [];
-    public order$ : BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
-    public ordersActive$ : BehaviorSubject<Order[]> = new BehaviorSubject<Order[]>(null);
+    public order$: BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
+    public ordersActive$: BehaviorSubject<Order[]> = new BehaviorSubject<Order[]>(null);
 
-    constructor(private dataStorage : Storage,
-                private userService : UserService) {
+    constructor(private dataStorage: Storage,
+                private userService: UserService) {
     }
 
     // pour transiter une Order (utilise dans l'history -> SingleOrder)
@@ -36,20 +36,20 @@ export class OrderService {
         this.ordersActive = orders;
     }
 
-    deleteOrder(order : Order) {
+    deleteOrder(order: Order) {
         let i = this.ordersActive.indexOf(order);
         this.ordersActive.splice(this.ordersActive.indexOf(order), 1);
         this.ordersActive$.next(this.ordersActive);
 
-        this.dataStorage.set('orders'+ this.userService.getActiveCustomer().CT_Num, JSON.stringify(this.ordersActive));
+        this.dataStorage.set('orders' + this.userService.getActiveCustomer().CT_Num, JSON.stringify(this.ordersActive));
     }
 
     // Permet d'initialiser la liste d'historique à partir du storage et renvoie les commmandes appartenant à un compte.
-    initAndGetOrdersStorage(){
+    initAndGetOrdersStorage() {
         this.ordersActive = [];
         this.dataStorage.ready().then(() => {
             this.dataStorage.get('orders' + this.userService.getActiveCustomer().CT_Num).then((orders) => {
-                if(orders != null) {
+                if (orders != null) {
                     let ordersTotal: Order[] = JSON.parse(orders);
                     ordersTotal.sort((a, b) => (new Date(b.orderDate).valueOf() - new Date(a.orderDate).valueOf()));
                     this.setActiveOrders(ordersTotal);
@@ -61,20 +61,20 @@ export class OrderService {
     }
 
     // Vérifie si c'est vide, si c'est le cas on ajoute simplement. Si non, on recupere d'abord le tableau puis on add
-    addOrder(order:Order) {
+    addOrder(order: Order) {
         this.ordersActive.push(order);
-        if(this.ordersActive.length > 20)
+        if (this.ordersActive.length > 20)
             this.ordersActive.splice(this.ordersActive.length, 1);
         this.ordersActive$.next(this.ordersActive);
         this.dataStorage.set('orders' + this.userService.getActiveCustomer().CT_Num, JSON.stringify(this.ordersActive))
     }
 
-    editOrderStorage(order : Order) {
+    editOrderStorage(order: Order) {
         // je récupérere le tableau de commande et je cherche l'index de l'objet qui a le même numéro de commande qu'order
         let found = false;
         let index = 0;
-        while(!found && index < this.ordersActive.length){
-            if(this.ordersActive[index].orderNumber == order.orderNumber){
+        while (!found && index < this.ordersActive.length) {
+            if (this.ordersActive[index].orderNumber == order.orderNumber) {
                 found = true;
                 this.ordersActive.splice(index, 1, order);
             } else

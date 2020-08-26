@@ -29,10 +29,7 @@ export class LoginPage implements OnInit{
             // Je vérifie que le storage n'est pas vide une fois le storage prêt
             this.storage.ready().then(async () => {
                 this.userService.initActiveUserFromStorage().then(() =>{
-                    console.log('initActive()');
                     this.userService.initAllUsersFromStorage().then(() => {
-                        console.log('initAllUsers()');
-                        console.log(this.userService.getCustomerAccounts());
                         if(this.userService.getActiveCustomer() != null)
                             this.router.navigateByUrl('/nav/article');
                         else

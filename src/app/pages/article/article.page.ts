@@ -97,7 +97,6 @@ export class ArticlePage implements OnInit, OnDestroy {
         await this.articleService.getF_ARTICLE(orderLineList).then(
             (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
         ).finally(() => {
-            console.log(this.orderLineList);
             this.cartService.initOrderLinesList(this.orderLineList);
             this.dismissLoading();
         });
