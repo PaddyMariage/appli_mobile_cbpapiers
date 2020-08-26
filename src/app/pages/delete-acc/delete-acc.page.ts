@@ -33,13 +33,12 @@ export class DeleteAccPage implements OnInit {
                 this.error = 'Veuillez entrer un identifiant';
         else if (!this.userService.isAdmin() && (this.password == '' || this.password == null)) {
             this.error = 'Veuillez entrer un mot de passe';
-        }
-        else {
+        } else {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
                 this.userService.setUserArrayStorage(account).then(() => {
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
-            }).catch((error:string) => {
+            }).catch((error: string) => {
                     this.error = error;
                 }
             );

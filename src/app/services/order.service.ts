@@ -8,10 +8,10 @@ import {BehaviorSubject} from 'rxjs';
     providedIn: 'root'
 })
 export class OrderService {
-    private order: Order;
-    private ordersActive: Order[] = [];
     public order$: BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
     public ordersActive$: BehaviorSubject<Order[]> = new BehaviorSubject<Order[]>(null);
+    private order: Order;
+    private ordersActive: Order[] = [];
 
     constructor(private dataStorage: Storage,
                 private userService: UserService) {
@@ -37,7 +37,6 @@ export class OrderService {
     }
 
     deleteOrder(order: Order) {
-        let i = this.ordersActive.indexOf(order);
         this.ordersActive.splice(this.ordersActive.indexOf(order), 1);
         this.ordersActive$.next(this.ordersActive);
 

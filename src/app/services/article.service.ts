@@ -2,14 +2,12 @@ import {Injectable} from '@angular/core';
 import {Article} from '../models/Article';
 import {HttpClient} from '@angular/common/http';
 import {HTTP} from "@ionic-native/http/ngx";
-import {BehaviorSubject} from "rxjs";
 import {F_DOCLIGNE} from "../models/JSON/F_DOCLIGNE";
 import {F_ARTICLE} from '../models/JSON/F_ARTICLE';
 import {F_ARTCLIENT} from '../models/JSON/F_ARTCLIENT';
 
 import {environment} from "../../environments/environment";
 import {OrderLine} from "../models/OrderLine";
-import {CartService} from "./cart.service";
 import {ArticleFrequency} from "../models/JSON/custom/ArticleFrequency";
 
 @Injectable({
@@ -19,7 +17,7 @@ export class ArticleService {
 
     private article: Article;
 
-    constructor(private http: HttpClient, private ionicHttp: HTTP, private cartService: CartService) {
+    constructor(private http: HttpClient, private ionicHttp: HTTP) {
     }
 
     setArticle(article: Article) {
@@ -111,7 +109,7 @@ export class ArticleService {
                     // on renvoie cette liste à la page.
                     resolve(orderLines);
                 })
-                .catch(error => {
+                .catch(() => {
                     reject('une erreur est survenue, veuillez recharger la page')
                 });
         });
@@ -158,7 +156,7 @@ export class ArticleService {
                     }
                     resolve(orderLineList);
                 })
-                .catch(error => reject('une erreur est survenue, veuillez recharger la page'));
+                .catch(() => reject('une erreur est survenue, veuillez recharger la page'));
         });
     }
 
@@ -234,7 +232,7 @@ export class ArticleService {
                     // on retourne la liste "finale"
                     resolve(orderLineList_Final);
                 })
-                .catch(error => {
+                .catch(() => {
                     reject('une erreur est survenue, veuillez recharger la page')
                 })
         });

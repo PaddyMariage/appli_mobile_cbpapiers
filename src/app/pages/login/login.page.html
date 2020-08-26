@@ -1,28 +1,29 @@
 <span *ngIf="showLogo">
-  <img src="assets/icon/logo.png" alt="logo">
+  <img alt="logo" src="assets/icon/logo.png">
 </span>
 <ion-content>
-  <form onsubmit={this.processForm}>
-    <ion-list>
-      <ion-item>
-        <ion-input [(ngModel)]="login" name="login" placeholder="Identifiant" required type="text"></ion-input>
-      </ion-item>
+    <form onsubmit={this.processForm}>
+        <ion-list>
+            <ion-item>
+                <ion-input [(ngModel)]="login" name="login" placeholder="Identifiant" required type="text"></ion-input>
+            </ion-item>
 
-      <ion-item>
-        <ion-input [(ngModel)]="password" name="password" placeholder="Mot de passe" required type="password"></ion-input>
-      </ion-item>
-    </ion-list>
+            <ion-item>
+                <ion-input [(ngModel)]="password" name="password" placeholder="Mot de passe" required
+                           type="password"></ion-input>
+            </ion-item>
+        </ion-list>
 
-    <div class='ion-padding'>
-      <ion-button (click)="logInF_COMPTET()" expand="block" class="ion-no-margin" type="submit">Login</ion-button>
+        <div class='ion-padding'>
+            <ion-button (click)="logInF_COMPTET()" class="ion-no-margin" expand="block" type="submit">Login</ion-button>
+        </div>
+    </form>
+    <div class="red"> {{error}} </div>
+    <div class="ion-text-center">
+        <a (click)="createContact()">Identifiants oublié?</a>
     </div>
-  </form>
-  <div class="red"> {{error}} </div>
-  <div class="ion-text-center">
-    <a (click)= "createContact()">Identifiants oublié?</a>
-  </div>
-  <!-- 
-    <ion-button expand="block" color="success" class="bouton" (click)="addCustomerAndGoToArticle()">Login client sans info</ion-button>
-    <ion-button expand="block" color="warning" class="bouton" (click)="goToAdministration()">Login admin sans info</ion-button>
-  -->
+    <!--
+      <ion-button expand="block" color="success" class="bouton" (click)="addCustomerAndGoToArticle()">Login client sans info</ion-button>
+      <ion-button expand="block" color="warning" class="bouton" (click)="goToAdministration()">Login admin sans info</ion-button>
+    -->
 </ion-content>

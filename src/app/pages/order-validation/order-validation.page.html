@@ -1,15 +1,18 @@
 <ion-content>
-  <div class="header"><img src="assets/icon/logo.png" alt="logo"></div>
-  <div class="body">
-    <div class="grand"><strong>vous remercie pour votre confiance !</strong></div><br/>
+    <div class="header"><img alt="logo" src="assets/icon/logo.png"></div>
+    <div class="body">
+        <div class="grand"><strong>vous remercie pour votre confiance !</strong></div>
+        <br/>
 
-    <div>Un mail vous sera bientôt envoyé pour confirmer votre commande</div><br/>
+        <div>Un mail vous sera bientôt envoyé pour confirmer votre commande</div>
+        <br/>
 
-    <div class="end"><strong>Montant total : </strong> <span class="green"> {{finalTotal | number : '1.2-2'}}€</span> </div>
-  </div>
+        <div class="end"><strong>Montant total : </strong> <span class="green"> {{finalTotal | number : '1.2-2'}}
+            €</span></div>
+    </div>
 
-  <div class="end">
-    <ion-button (click)="sendPdf()" color="success" > Envoyer la commande </ion-button>
-  </div>
+    <div class="end">
+        <ion-button (click)="sendPdf()" color="success"> Envoyer la commande</ion-button>
+    </div>
 
 </ion-content>

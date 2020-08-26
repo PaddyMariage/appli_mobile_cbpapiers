@@ -1,8 +1,15 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Order} from '../../models/Order';
 import {OrderService} from '../../services/order.service';
-import {AlertController, AnimationController, ModalController, NavController, Platform, ToastController} from '@ionic/angular';
-import { cloneDeep } from 'lodash';
+import {
+    AlertController,
+    AnimationController,
+    ModalController,
+    NavController,
+    Platform,
+    ToastController
+} from '@ionic/angular';
+import {cloneDeep} from 'lodash';
 import {CartService} from '../../services/cart.service';
 
 import {File} from '@ionic-native/file/ngx';
@@ -25,12 +32,19 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export class SingleOrderPage implements OnInit, OnDestroy {
 
     order: Order;
-    orders : Order[] = [];
+    orders: Order[] = [];
     total = 0;
     canEdit: boolean;
     pdfObj = null;
     deadline: Date;
     orderSub: Subscription;
+    header = [
+        {text: 'Reference article', style: 'tableHeader', alignment: 'center'},
+        {text: 'Quantité', style: 'tableHeader', alignment: 'center'},
+        {text: 'Prix', style: 'tableHeader', alignment: 'center'}
+    ];
+    // on initialise les lignes du tableau avec le header
+    myBody = [this.header];
 
     constructor(private orderService: OrderService,
                 private cartService: CartService,
@@ -52,7 +66,7 @@ export class SingleOrderPage implements OnInit, OnDestroy {
                 this.order = order;
                 this.total = 0;
                 this.order.orderLines.forEach(value => this.total += (value.article.unitPrice * value.quantity));
-        });
+            });
 
         this.orders = this.orderService.getActiveOrders();
         this.total = 0;
@@ -75,21 +89,20 @@ export class SingleOrderPage implements OnInit, OnDestroy {
     }
 
     // permet de calculer le temps restant à afficher avant de ne plus pouvoir éditer ou annuler une commande
-        calculateElapsedTime(){
-            const timeStart = new Date().getTime();
-            const timeEnd = new Date(this.deadline).getTime();
-            const hourDiff = timeEnd - timeStart; //in ms
-            const minDiff = Math.floor(hourDiff / 60 / 1000); //in minutes
-            const hDiff = hourDiff / 3600 / 1000; //in hours
-            const humanReadable = {
-                hours : null,
-                minutes : null
-            };
-            humanReadable.hours = Math.floor(hDiff);
-            humanReadable.minutes = minDiff - 60 * humanReadable.hours;
-            return humanReadable;
-        }
-
+    calculateElapsedTime() {
+        const timeStart = new Date().getTime();
+        const timeEnd = new Date(this.deadline).getTime();
+        const hourDiff = timeEnd - timeStart; //in ms
+        const minDiff = Math.floor(hourDiff / 60 / 1000); //in minutes
+        const hDiff = hourDiff / 3600 / 1000; //in hours
+        const humanReadable = {
+            hours: null,
+            minutes: null
+        };
+        humanReadable.hours = Math.floor(hDiff);
+        humanReadable.minutes = minDiff - 60 * humanReadable.hours;
+        return humanReadable;
+    }
 
     async alertConfirm() {
         const alert = await this.alertController.create({
@@ -111,16 +124,6 @@ export class SingleOrderPage implements OnInit, OnDestroy {
             ]
         });
         await alert.present();
-    }
-    // todo : supprimer la commande du storage mais pas toucher a l'appli comme ça ça sera affiché comme annulé mais
-    // elle ne sera plus la une fois l'appli fermé/rouverte.
-    private sendCancel() {
-        this.createPdf();
-        this.sendMail();
-        this.orderService.getOrder().isCancelled = true;
-        this.orderService.deleteOrder(this.orderService.getOrder());
-        this.navController.navigateBack(['/nav/history']);
-
     }
 
     // méthode appelée lorsqu'on veut recommander à partir de la commande (ajout des articles de la commande dans le panier)
@@ -148,18 +151,6 @@ export class SingleOrderPage implements OnInit, OnDestroy {
         this.navController.navigateBack(['/nav/article']);
     }
 
-    header = [
-        {text: 'Reference article', style: 'tableHeader', alignment: 'center'},
-        {text: 'Quantité', style: 'tableHeader', alignment: 'center'},
-        {text: 'Prix', style: 'tableHeader', alignment: 'center'}
-    ];
-
-    // on initialise les lignes du tableau avec le header
-    myBody = [this.header];
-
-    // construction des lignes du tableau : pour chaque orderline récupérée du panier
-    // on ajoute cette orderline dans une ligne du tableau avec les éléments dont on a besoin :
-    // ici reference de l'article, quantité et prix final
     // l'array myBody est donc incrémenté de nouvelles données
     constructBody() {
         for (const orderline of this.order.orderLines) {
@@ -168,6 +159,10 @@ export class SingleOrderPage implements OnInit, OnDestroy {
         }
         return this.myBody;
     }
+
+    // construction des lignes du tableau : pour chaque orderline récupérée du panier
+    // on ajoute cette orderline dans une ligne du tableau avec les éléments dont on a besoin :
+    // ici reference de l'article, quantité et prix final
 
     createPdf() {
         const docDefinitionPart1 = [
@@ -179,18 +174,18 @@ export class SingleOrderPage implements OnInit, OnDestroy {
             }
         ];
 
-            const docDefinitionPart2 = [
-                {
-                    text: 'ATTENTION Commande ' + this.order.orderNumber
-                        + ' ' + new Date(this.order.orderDate).toLocaleDateString()  +
-                        ' ' + new Date(this.order.orderDate).toLocaleTimeString()
-                        + ' ANNULEE', style: 'subheader'
-                },
-                {text: this.userService.getActiveCustomer().CT_Intitule},
-                {text: this.userService.getActiveCustomer().CT_Adresse},
-                {text: this.userService.getActiveCustomer().CT_CodePostal + ' ' + this.userService.getActiveCustomer().CT_Ville},
-                {text: this.userService.getActiveCustomer().CT_Pays}
-            ];
+        const docDefinitionPart2 = [
+            {
+                text: 'ATTENTION Commande ' + this.order.orderNumber
+                    + ' ' + new Date(this.order.orderDate).toLocaleDateString() +
+                    ' ' + new Date(this.order.orderDate).toLocaleTimeString()
+                    + ' ANNULEE', style: 'subheader'
+            },
+            {text: this.userService.getActiveCustomer().CT_Intitule},
+            {text: this.userService.getActiveCustomer().CT_Adresse},
+            {text: this.userService.getActiveCustomer().CT_CodePostal + ' ' + this.userService.getActiveCustomer().CT_Ville},
+            {text: this.userService.getActiveCustomer().CT_Pays}
+        ];
 
 
         // c'est ici qu'on construit le tableau dans le pdf :
@@ -231,79 +226,88 @@ export class SingleOrderPage implements OnInit, OnDestroy {
         this.downloadPdf();
     }
 
-      downloadPdf(){
-          if (this.plt.is('cordova')) {
-              this.pdfObj.getBuffer((buffer) => {
-                  let blob = new Blob([buffer], {type: 'application/pdf'});
+    downloadPdf() {
+        if (this.plt.is('cordova')) {
+            this.pdfObj.getBuffer((buffer) => {
+                let blob = new Blob([buffer], {type: 'application/pdf'});
 
-                  // Save the PDF to the data Directory of our App
-                  this.file.writeFile(this.file.dataDirectory, 'annulation.pdf', blob, {replace: true}).then(fileEntry => {
-                  });
-              });
-          } else {
-              // On a browser simply use download!
-              this.pdfObj.download();
-          }
-      }
+                // Save the PDF to the data Directory of our App
+                this.file.writeFile(this.file.dataDirectory, 'annulation.pdf', blob, {replace: true});
+            });
+        } else {
+            // On a browser simply use download!
+            this.pdfObj.download();
+        }
+    }
 
-      sendMail(){
-          const email = {
-              // to: 'contact@cbpapiers.com',
-              to: 'commandemobile@cbpapiers.com',
-              attachments: [
-                  this.file.dataDirectory + 'annulation.pdf'
-              ],
-          subject: 'ANNULATION COMMANDE N° ' + this.order.orderNumber + ' | REFCLIENT : ' + this.userService.getActiveCustomer().CT_Num,
-              body: 'ATTENTION ANNULATION',
-              isHtml: true
-          };
-          this.emailComposer.open(email);
-      }
+    sendMail() {
+        const email = {
+            // to: 'contact@cbpapiers.com',
+            to: 'commandemobile@cbpapiers.com',
+            attachments: [
+                this.file.dataDirectory + 'annulation.pdf'
+            ],
+            subject: 'ANNULATION COMMANDE N° ' + this.order.orderNumber + ' | REFCLIENT : ' + this.userService.getActiveCustomer().CT_Num,
+            body: 'ATTENTION ANNULATION',
+            isHtml: true
+        };
+        this.emailComposer.open(email);
+    }
 
 // ouverture de la modal contact lorsqu'on souhaite contacter CB Papiers aprés que la deadline pour éditer ou annuler une commande soit passée
     async alertCBPapiers() {
-            const enterAnimation = (baseEl: any) => {
-                // création de l'animation via AnimationControleur
-                const backdropAnimation = this.animationCtrl.create()
-                    .addElement(baseEl.querySelector('ion-backdrop'));
+        const enterAnimation = (baseEl: any) => {
+            // création de l'animation via AnimationControleur
+            const backdropAnimation = this.animationCtrl.create()
+                .addElement(baseEl.querySelector('ion-backdrop'));
 
-                // définition des paramétres de l'animation
-                const wrapperAnimation = this.animationCtrl.create()
-                    .addElement(baseEl.querySelector('.modal-wrapper'));
+            // définition des paramétres de l'animation
+            const wrapperAnimation = this.animationCtrl.create()
+                .addElement(baseEl.querySelector('.modal-wrapper'));
 
-                // la méthode fromTo permet de dire de quels parametres ça commence / ça fini
-                wrapperAnimation.fromTo('transform', 'scaleX(0.1) scaleY(0.1)', 'translateX(0%) scaleX(1) scaleY(1)')
-                    .fromTo('opacity', 0, 1);
+            // la méthode fromTo permet de dire de quels parametres ça commence / ça fini
+            wrapperAnimation.fromTo('transform', 'scaleX(0.1) scaleY(0.1)', 'translateX(0%) scaleX(1) scaleY(1)')
+                .fromTo('opacity', 0, 1);
 
-                backdropAnimation.fromTo('opacity', 0.01, 0.4);
+            backdropAnimation.fromTo('opacity', 0.01, 0.4);
 
-                // on retourne l'animation avec ses différents éléments
-                return this.animationCtrl.create()
-                    .addElement(baseEl)
-                    .easing('cubic-bezier(0.36,0.66,0.04,1)')
-                    .duration(300)
-                    .beforeAddClass('show-modal')
-                    .addAnimation([backdropAnimation, wrapperAnimation]);
-            };
+            // on retourne l'animation avec ses différents éléments
+            return this.animationCtrl.create()
+                .addElement(baseEl)
+                .easing('cubic-bezier(0.36,0.66,0.04,1)')
+                .duration(300)
+                .beforeAddClass('show-modal')
+                .addAnimation([backdropAnimation, wrapperAnimation]);
+        };
 
-            // pour l'animation de retour, on joue simplement l'inverse de l'animation d'entrée
-            const leaveAnimation = (baseEl: any) => {
-                return enterAnimation(baseEl).direction('reverse');
-            };
-            // Création du modal avec les animations et les css défini
-            const modal = await this.modalController.create({
-                component: ContactPage,
-                enterAnimation,
-                leaveAnimation,
-                cssClass: 'modal-pop'
-            });
+        // pour l'animation de retour, on joue simplement l'inverse de l'animation d'entrée
+        const leaveAnimation = (baseEl: any) => {
+            return enterAnimation(baseEl).direction('reverse');
+        };
+        // Création du modal avec les animations et les css défini
+        const modal = await this.modalController.create({
+            component: ContactPage,
+            enterAnimation,
+            leaveAnimation,
+            cssClass: 'modal-pop'
+        });
 
-            // lancement du modal
-            return await modal.present();
+        // lancement du modal
+        return await modal.present();
 
     }
 
     ngOnDestroy() {
         this.orderSub.unsubscribe();
+    }
+
+    // elle ne sera plus la une fois l'appli fermé/rouverte.
+    private sendCancel() {
+        this.createPdf();
+        this.sendMail();
+        this.orderService.getOrder().isCancelled = true;
+        this.orderService.deleteOrder(this.orderService.getOrder());
+        this.navController.navigateBack(['/nav/history']);
+
     }
 }

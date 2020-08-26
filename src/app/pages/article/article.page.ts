@@ -85,54 +85,6 @@ export class ArticlePage implements OnInit, OnDestroy {
         this.initTopF_ARTICLE();
     }
 
-    private initTopF_ARTICLE() {
-        this.articleService.getDocLignes(this.customer.CT_Num)
-            .then((orderLines: OrderLine[]) => {
-                    this.cartService.initOrderLinesList(orderLines);
-                    this.error = '';
-                    this.errorBol = false;
-                    this.initAllInfos(orderLines);
-                }
-            )
-            .catch(error => {
-                this.dismissLoading();
-                this.error = error;
-                this.errorBol = true;
-            });
-    }
-
-    private initAllInfos(orderLineList: OrderLine[]) {
-        this.articleService.getArtClients(orderLineList, this.customer.CT_Num)
-            .then((orderLineList_Updated: OrderLine[]) => {
-                this.orderLineList = orderLineList_Updated;
-                this.initAllPrices(this.orderLineList);
-                this.errorBol = false;
-                this.error = '';
-            })
-            .catch(error => {
-                this.dismissLoading();
-                this.error = error;
-                this.errorBol = true;
-        });
-    }
-
-    private initAllPrices(orderLineList: OrderLine[]) {
-        this.articleService.getF_ARTICLE(orderLineList)
-            .then((orderLineList_Final: OrderLine[]) => {
-                this.orderLineList = orderLineList_Final;
-                this.error = '';
-                this.errorBol = false;
-                this.dismissLoading();
-            })
-            .catch( error =>  {
-                this.error = error;
-                this.errorBol = true;
-                this.dismissLoading();
-            });
-    }
-
-
-    // retourne un backup d'orderLineList générée en initialisation de page.
     // l'intérêt est d'avoir une liste clean en backup qu'on envoie à la fonction filtre
     getOrderLines() {
         return this.orderLineBackup;
@@ -174,7 +126,9 @@ export class ArticlePage implements OnInit, OnDestroy {
 
     }
 
-    // Dés qu'une quantité est selectionnée pour un article, la méthode met à jour le panier et envoie l'information au cartservice
+
+    // retourne un backup d'orderLineList générée en initialisation de page.
+
     // on interprète le fait que c'est une suppression ou un ajout ou une mise à jour
     onChangeOrderLine($event: any, orderLine: OrderLine) {
 
@@ -209,6 +163,54 @@ export class ArticlePage implements OnInit, OnDestroy {
         this.cartSub.unsubscribe();
         this.orderLineSub.unsubscribe();
         this.activeCustomerSub.unsubscribe();
+    }
+
+    private initTopF_ARTICLE() {
+        this.articleService.getDocLignes(this.customer.CT_Num)
+            .then((orderLines: OrderLine[]) => {
+                    this.cartService.initOrderLinesList(orderLines);
+                    this.error = '';
+                    this.errorBol = false;
+                    this.initAllInfos(orderLines);
+                }
+            )
+            .catch(error => {
+                this.dismissLoading();
+                this.error = error;
+                this.errorBol = true;
+            });
+    }
+
+    // Dés qu'une quantité est selectionnée pour un article, la méthode met à jour le panier et envoie l'information au cartservice
+
+    private initAllInfos(orderLineList: OrderLine[]) {
+        this.articleService.getArtClients(orderLineList, this.customer.CT_Num)
+            .then((orderLineList_Updated: OrderLine[]) => {
+                this.orderLineList = orderLineList_Updated;
+                this.initAllPrices(this.orderLineList);
+                this.errorBol = false;
+                this.error = '';
+            })
+            .catch(error => {
+                this.dismissLoading();
+                this.error = error;
+                this.errorBol = true;
+            });
+    }
+
+    private initAllPrices(orderLineList: OrderLine[]) {
+        this.articleService.getF_ARTICLE(orderLineList)
+            .then((orderLineList_Final: OrderLine[]) => {
+                this.orderLineList = orderLineList_Final;
+                this.error = '';
+                this.errorBol = false;
+                this.dismissLoading();
+            })
+            .catch(error => {
+                this.error = error;
+                this.errorBol = true;
+                this.dismissLoading();
+            });
     }
 }
 

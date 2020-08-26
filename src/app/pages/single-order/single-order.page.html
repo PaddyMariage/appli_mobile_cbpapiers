@@ -1,14 +1,14 @@
 <app-header></app-header>
 <ion-toolbar>
     <ion-buttons slot="start">
-        <ion-back-button icon="chevron-back-outline" default-href="/"></ion-back-button>
+        <ion-back-button default-href="/" icon="chevron-back-outline"></ion-back-button>
     </ion-buttons>
     {{order.orderNumber | uppercase}}
 </ion-toolbar>
 <ion-content class="ion-padding">
     <ion-item *ngFor="let orderLine of order.orderLines">
         {{orderLine.article.label + ' x' + orderLine.quantity}}
-        <div slot="end" class="green">
+        <div class="green" slot="end">
             {{orderLine.article.unitPrice * orderLine.quantity |number : '1.2-2'}}
         </div>
     </ion-item>
@@ -21,15 +21,18 @@
             <p>Total HT : <span> <b>{{total + 20 |number : '1.2-2'}}</b> €</span></p>
         </ng-template>
         <div>
-            <ion-button color="success" size="small" (click)="reorder()">Commander à nouveau</ion-button>
-            <ion-button *ngIf="!canEdit" (click)="alertCBPapiers()" > Contacter CBPapiers </ion-button>
+            <ion-button (click)="reorder()" color="success" size="small">Commander à nouveau</ion-button>
+            <ion-button (click)="alertCBPapiers()" *ngIf="!canEdit"> Contacter CBPapiers</ion-button>
         </div>
         <div *ngIf="canEdit">
             <div *ngIf="!order.isCancelled">
-                <span> TEMPS RESTANT {{calculateElapsedTime().hours }}h{{calculateElapsedTime().minutes }} POUR : </span>
+                <span> TEMPS RESTANT {{calculateElapsedTime().hours }}h{{calculateElapsedTime().minutes }}
+                    POUR : </span>
                 <div>
-                    <ion-button (click)="alertConfirm()" color="danger"  size="small" fill="solid">Annuler</ion-button>
-                    <ion-button (click)="editOrder()" color="warning" size="small" fill="solid" routerLink="/nav/article">Editer</ion-button>
+                    <ion-button (click)="alertConfirm()" color="danger" fill="solid" size="small">Annuler</ion-button>
+                    <ion-button (click)="editOrder()" color="warning" fill="solid" routerLink="/nav/article"
+                                size="small">Editer
+                    </ion-button>
                 </div>
             </div>
 

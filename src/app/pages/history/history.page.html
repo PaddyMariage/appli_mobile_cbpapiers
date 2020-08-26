@@ -1,17 +1,17 @@
 <app-header></app-header>
 
 <ion-content class="ion-padding">
-  <strong>Historique des commandes : </strong>
-  <ion-list>
-      <ion-item detail *ngFor="let order of history"
-                (click)="onClickOrder(order)"
-                routerLink="/nav/history/single-order">
+    <strong>Historique des commandes : </strong>
+    <ion-list>
+        <ion-item (click)="onClickOrder(order)" *ngFor="let order of history"
+                  detail
+                  routerLink="/nav/history/single-order">
     <span *ngIf="order.isCancelled" class="cancel">
         ANNULEE &nbsp;
     </span>
-          {{order.orderNumber| uppercase}} {{order.orderDate | date: 'dd/MM/yyyy' : 'UTC'}}
-      </ion-item>
-  </ion-list>
+            {{order.orderNumber| uppercase}} {{order.orderDate | date: 'dd/MM/yyyy' : 'UTC'}}
+        </ion-item>
+    </ion-list>
 </ion-content>
 
 

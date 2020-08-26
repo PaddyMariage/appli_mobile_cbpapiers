@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {OrderService} from 'src/app/services/order.service';
 import {OrderLine} from 'src/app/models/OrderLine';
 import {ModalController} from '@ionic/angular';
@@ -111,11 +111,7 @@ export class CartPage implements OnInit, OnDestroy {
     }
 
     updateStatusShipping() {
-        if (this.warehouseRetrieval || this.total >= 250) {
-            this.statusShipping = false;
-        } else {
-            this.statusShipping = true;
-        }
+        this.statusShipping = !(this.warehouseRetrieval || this.total >= 250);
     }
 
     updateCart($event: any, line: OrderLine) {

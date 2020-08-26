@@ -1,11 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, NgZone, OnInit} from '@angular/core';
 import {ModalController, NavController, Platform} from '@ionic/angular';
 import {UserService} from 'src/app/services/user.service';
-import {NavigationEnd, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {F_COMPTET} from '../../models/JSON/F_COMPTET';
 import {Storage} from "@ionic/storage";
-import { NgZone  } from '@angular/core';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
+import {StatusBar} from '@ionic-native/status-bar/ngx';
 import {ContactPage} from "../contact/contact.page";
 
 @Component({
@@ -13,12 +12,12 @@ import {ContactPage} from "../contact/contact.page";
     templateUrl: './login.page.html',
     styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit{
+export class LoginPage implements OnInit {
 
     login: string;
     password: string;
     error: string;
-    showLogo : boolean = true;
+    showLogo: boolean = true;
 
     constructor(private navCtrl: NavController,
                 private modalController: ModalController,
@@ -26,8 +25,8 @@ export class LoginPage implements OnInit{
                 private router: Router,
                 private platForm: Platform,
                 private storage: Storage,
-                private ngZone : NgZone,
-                private statusBar : StatusBar) {
+                private ngZone: NgZone,
+                private statusBar: StatusBar) {
 
         this.platForm.ready().then(() => {
             this.statusBar.show();
@@ -35,12 +34,11 @@ export class LoginPage implements OnInit{
             // j'initialise toutes les donnees avec les storage et je redirige en fonction
             // de ce qui a ete recup dans le storage
             this.storage.ready().then(async () => {
-                this.userService.initActiveUserFromStorage().then(() =>{
+                this.userService.initActiveUserFromStorage().then(() => {
                     this.userService.initAllUsersFromStorage().then(() => {
-                        if(this.userService.getActiveCustomer() != null)
+                        if (this.userService.getActiveCustomer() != null)
                             this.router.navigateByUrl('/nav/article');
-                        else
-                        if (this.userService.getCustomerAccounts().length > 1)
+                        else if (this.userService.getCustomerAccounts().length > 1)
                             this.router.navigateByUrl('/acc-choice');
                     });
                 });
@@ -69,33 +67,6 @@ export class LoginPage implements OnInit{
         });
     }
 
-
-    // permet d'ajouter le client et d'aller aux articles. Async obligatoire sous peine d'erreur
-    addCustomerAndGoToArticle() {
-        const compte: F_COMPTET =
-            {
-                CT_Num: "ADRANO",
-                CT_Intitule: "ADRANO PIZZ",
-                CT_Adresse: "9 ZONE COMMERCIALE DU TRIANGLE",
-                CT_CodePostal: "F-57525",
-                CT_Ville: "TALANGE",
-                CT_Pays: "FRANCE",
-                CT_Sommeil: 0,
-                CT_Telephone: "06 01 03 10 07",
-                CT_EMail: "contact@adranopizz.fr",
-                MDP: "password"
-            };
-
-        // on ne va pas utiliser de set mais un systeme d'ajout/suppresion de compte. Ici, il est ajouté
-        this.userService.addCustomer(compte);
-        this.userService.setActiveCustomer(compte);
-        this.navCtrl.navigateForward(['/nav/article']);
-    }
-
-    goToAdministration() {
-        this.navCtrl.navigateForward(['administration']);
-    }
-
     async createContact() {
         const modal = await this.modalController.create({
             component: ContactPage,
@@ -118,7 +89,7 @@ export class LoginPage implements OnInit{
                 this.userService.setUserArrayStorage(account).then(() => {
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
-            }).catch((error:string) => {
+            }).catch((error: string) => {
                     this.error = error;
                 }
             );

@@ -14,9 +14,8 @@ import {UserService} from '../../services/user.service';
 import {OrderLine} from '../../models/OrderLine';
 import {OrderService} from '../../services/order.service';
 import {Order} from '../../models/Order';
-import { cloneDeep } from 'lodash';
+import {cloneDeep} from 'lodash';
 import {GenerateIDService} from '../../services/generate-id.service';
-import {Storage} from "@ionic/storage";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -32,6 +31,14 @@ export class OrderValidationPage implements OnInit {
     order: Order;
     statusShipping: boolean;
     orderNumberWasNull: boolean;
+    // construction du header du tableau du pdf = titres des colonnes du tableau
+    header = [
+        {text: 'Reference article', style: 'tableHeader', alignment: 'center'},
+        {text: 'Quantité', style: 'tableHeader', alignment: 'center'},
+        {text: 'Prix', style: 'tableHeader', alignment: 'center'}
+    ];
+    // on initialise les lignes du tableau avec le header
+    myBody = [this.header];
 
     constructor(private plt: Platform,
                 private file: File,
@@ -42,8 +49,7 @@ export class OrderValidationPage implements OnInit {
                 private userService: UserService,
                 private orderService: OrderService,
                 private modalController: ModalController,
-                private generateIdService: GenerateIDService,
-                private storage : Storage) {
+                private generateIdService: GenerateIDService) {
     }
 
     ngOnInit() {
@@ -51,7 +57,6 @@ export class OrderValidationPage implements OnInit {
         this.finalTotal = this.cartService.getFinalTotal();
         this.statusShipping = this.warehouseRetService.getStatusShipping();
     }
-
 
     // permet d'indiquer si y a un retrait entrepôt ou non en fonction du statut du toogle du retrait entrepôt
     isWarehouseRet() {
@@ -62,19 +67,10 @@ export class OrderValidationPage implements OnInit {
         return this.statusShipping ? '20 €' : 'gratuite';
     }
 
-    // construction du header du tableau du pdf = titres des colonnes du tableau
-    header = [
-        {text: 'Reference article', style: 'tableHeader', alignment: 'center'},
-        {text: 'Quantité', style: 'tableHeader', alignment: 'center'},
-        {text: 'Prix', style: 'tableHeader', alignment: 'center'}
-    ];
-
-    // on initialise les lignes du tableau avec le header
-    myBody = [this.header];
-
     // construction des lignes du tableau : pour chaque orderline récupérée du panier
     // on ajoute cette orderline dans une ligne du tableau avec les éléments dont on a besoin :
     // ici reference de l'article, quantité et prix final
+
     // l'array myBody est donc incrémenté de nouvelles données
     constructBody() {
         for (const orderline of this.order.orderLines) {
@@ -113,7 +109,7 @@ export class OrderValidationPage implements OnInit {
             docDefinitionPart2 = [
                 {
                     text: 'ATTENTION Commande n° ' + this.cartService.getCart().orderNumber
-                        + ' du ' + new Date(this.cartService.getCart().orderDate).toLocaleDateString()  +
+                        + ' du ' + new Date(this.cartService.getCart().orderDate).toLocaleDateString() +
                         ' ' + new Date(this.cartService.getCart().orderDate).toLocaleTimeString()
                         + ' MODIFIEE', style: 'subheader'
                 },
@@ -189,10 +185,7 @@ export class OrderValidationPage implements OnInit {
                 let blob = new Blob([buffer], {type: 'application/pdf'});
 
                 // Save the PDF to the data Directory of our App
-                this.file.writeFile(this.file.dataDirectory, 'commande.pdf', blob, {replace: true}).then(fileEntry => {
-                    //  à enlever !  je laisse juste pour les tests sur pc
-                    // this.fileOpener.open(this.file.dataDirectory + 'myletter.pdf', 'application/pdf');
-                });
+                this.file.writeFile(this.file.dataDirectory, 'commande.pdf', blob, {replace: true});
             });
         } else {
             // On a browser simply use download!

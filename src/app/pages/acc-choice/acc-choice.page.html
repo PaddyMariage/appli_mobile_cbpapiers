@@ -1,32 +1,34 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-row>
-        <ion-col size="2">
+    <ion-toolbar>
+        <ion-row>
+            <ion-col size="2">
             <span *ngIf="customer != null">
-              <ion-back-button defaultHref="nav/article" color="success"></ion-back-button>
+              <ion-back-button color="success" defaultHref="nav/article"></ion-back-button>
             </span>
-        </ion-col>
-      <ion-col size="2.5"></ion-col>
-      <ion-col size="auto">
-        <img src="assets/icon/logo.jpg" class="header" alt="logo">
-      </ion-col>
-    </ion-row>
-  </ion-toolbar>
-</ion-header> 
+            </ion-col>
+            <ion-col size="2.5"></ion-col>
+            <ion-col size="auto">
+                <img alt="logo" class="header" src="assets/icon/logo.jpg">
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-list-header class="large"><strong>Selection du compte </strong></ion-list-header>
-    <ion-item *ngFor="let compte of accounts" >
-      <!--<ion-avatar slot="start" (click)="selectAccountAndGoToArticles(compte)"><img src="{{compte.picture.img}}"></ion-avatar> -->
-      <ion-label (click)="selectAccountAndGoToArticles(compte)" class="espaceDroite">{{compte.CT_Intitule}}</ion-label>
-      <ion-label (click)="selectAccountAndGoToArticles(compte)">{{compte.CT_Ville}}</ion-label>
-      <ion-button color="success" slot="end" (click)="goToSettings(compte)">Plus..</ion-button>
-    </ion-item>
-  </ion-list>
+    <ion-list>
+        <ion-list-header class="large"><strong>Selection du compte </strong></ion-list-header>
+        <ion-item *ngFor="let compte of accounts">
+            <!--<ion-avatar slot="start" (click)="selectAccountAndGoToArticles(compte)"><img src="{{compte.picture.img}}"></ion-avatar> -->
+            <ion-label (click)="selectAccountAndGoToArticles(compte)"
+                       class="espaceDroite">{{compte.CT_Intitule}}</ion-label>
+            <ion-label (click)="selectAccountAndGoToArticles(compte)">{{compte.CT_Ville}}</ion-label>
+            <ion-button (click)="goToSettings(compte)" color="success" slot="end">Plus..</ion-button>
+        </ion-item>
+    </ion-list>
 
-  <ion-item (click)="goToAddAccount()">
-    <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-    <ion-label>Ajouter un nouveau compte</ion-label>>
+    <ion-item (click)="goToAddAccount()">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        <ion-label>Ajouter un nouveau compte</ion-label>
+        >
     </ion-item>
 </ion-content>

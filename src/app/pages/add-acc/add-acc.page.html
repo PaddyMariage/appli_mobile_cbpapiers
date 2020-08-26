@@ -1,35 +1,38 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-button slot="start" color="success">
-      <ion-back-button></ion-back-button>
-    </ion-button>
-  </ion-toolbar>
+    <ion-toolbar>
+        <ion-button color="success" slot="start">
+            <ion-back-button></ion-back-button>
+        </ion-button>
+    </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-title><img src="assets/icon/CB_PAPIERS_VECTOR_LOGO-1.png" alt="logo"></ion-title>
+    <ion-title><img alt="logo" src="assets/icon/CB_PAPIERS_VECTOR_LOGO-1.png"></ion-title>
 
-  <ion-card color="success">
-    <ion-card-content>
-      Insérez le login et le mot de passe pour ajouter le compte à l'appareil
-    </ion-card-content>
-  </ion-card>
+    <ion-card color="success">
+        <ion-card-content>
+            Insérez le login et le mot de passe pour ajouter le compte à l'appareil
+        </ion-card-content>
+    </ion-card>
 
-  <!-- Pas encore utilisé mais ressemble au form d'angular normalement -->
-  <form onsubmit={this.processForm}>
-    <ion-list>
-      <ion-item>
-        <ion-input [(ngModel)]="login" name="login" placeholder="Identifiants" required type="text"></ion-input>
-      </ion-item>
+    <!-- Pas encore utilisé mais ressemble au form d'angular normalement -->
+    <form onsubmit={this.processForm}>
+        <ion-list>
+            <ion-item>
+                <ion-input [(ngModel)]="login" name="login" placeholder="Identifiants" required type="text"></ion-input>
+            </ion-item>
 
-      <ion-item>
-        <ion-input [(ngModel)]="password" name="password" placeholder="Mot de passe" required type="password"></ion-input>
-      </ion-item>
-    </ion-list>  
-    <div class="red">{{error}}</div>
-    <div class='ion-padding'>
-      <ion-button expand="block" class="ion-no-margin" type="submit" (click)="addAccountAndRedirect()">Ajouter compte</ion-button>
-    </div>
-  </form>
+            <ion-item>
+                <ion-input [(ngModel)]="password" name="password" placeholder="Mot de passe" required
+                           type="password"></ion-input>
+            </ion-item>
+        </ion-list>
+        <div class="red">{{error}}</div>
+        <div class='ion-padding'>
+            <ion-button (click)="addAccountAndRedirect()" class="ion-no-margin" expand="block" type="submit">Ajouter
+                compte
+            </ion-button>
+        </div>
+    </form>
 
 </ion-content>

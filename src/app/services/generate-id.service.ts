@@ -1,46 +1,45 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class GenerateIDService {
-  public ids: string[] = [];
+    public ids: string[] = [];
 
-  constructor() { }
-
-  public generate(): string {
-    let isUnique = false;
-    let tempId = '';
-
-    while (!isUnique) {
-      tempId = this.generator();
-      if (!this.idExists(tempId)) {
-        isUnique = true;
-        this.ids.push(tempId);
-      }
+    constructor() {
     }
 
-    return tempId;
-  }
+    public generate(): string {
+        let isUnique = false;
+        let tempId = '';
 
-  public remove(id: string): void {
-    const index = this.ids.indexOf(id);
-    this.ids.splice(index, 1);
-  }
+        while (!isUnique) {
+            tempId = this.generator();
+            if (!this.idExists(tempId)) {
+                isUnique = true;
+                this.ids.push(tempId);
+            }
+        }
 
-  // format de génération du numéro de commande : MOBI- suivi de 4 chiffres générées aléatoirement
-  private generator(): string {
-    const isString = 'MOBI-' + `${this.S4()}`;
+        return tempId;
+    }
 
-    return isString;
-  }
+    public remove(id: string): void {
+        const index = this.ids.indexOf(id);
+        this.ids.splice(index, 1);
+    }
 
-  private idExists(id: string): boolean {
-    return this.ids.includes(id);
-  }
+    // format de génération du numéro de commande : MOBI- suivi de 4 chiffres générées aléatoirement
+    private generator(): string {
+        return 'MOBI-' + `${this.S4()}`;
+    }
 
-  private S4(): number {
-    // tslint:disable-next-line:no-bitwise
-    return (((1 + Math.random()) * 0x1000) | 0);
-  }
+    private idExists(id: string): boolean {
+        return this.ids.includes(id);
+    }
+
+    private S4(): number {
+        // tslint:disable-next-line:no-bitwise
+        return (((1 + Math.random()) * 0x1000) | 0);
+    }
 }

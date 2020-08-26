@@ -1,9 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {UserService} from 'src/app/services/user.service';
-import {Router} from "@angular/router";
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
-import {Storage} from "@ionic/storage";
-import { NavController } from '@ionic/angular';
+import {NavController} from '@ionic/angular';
 
 @Component({
     selector: 'app-add-acc',
@@ -17,7 +15,7 @@ export class AddAccPage {
     error: string;
 
     constructor(private userService: UserService,
-                private navCtrl : NavController) {
+                private navCtrl: NavController) {
     }
 
     async addAccountAndRedirect() {
@@ -28,13 +26,12 @@ export class AddAccPage {
                 this.error = 'Veuillez entrer un identifiant';
         else if (!this.userService.isAdmin() && (this.password == '' || this.password == null)) {
             this.error = 'Veuillez entrer un mot de passe';
-        }
-        else {
+        } else {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
                 this.userService.setUserArrayStorage(account).then(() => {
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
-            }).catch((error:string) => {
+            }).catch((error: string) => {
                     this.error = error;
                 }
             );

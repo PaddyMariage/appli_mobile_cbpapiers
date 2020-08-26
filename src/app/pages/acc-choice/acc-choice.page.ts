@@ -2,7 +2,6 @@ import {Component, OnDestroy} from '@angular/core';
 import {NavController} from '@ionic/angular';
 import {UserService} from 'src/app/services/user.service';
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
-import {Router} from '@angular/router';
 import {Subscription} from "rxjs";
 
 @Component({
