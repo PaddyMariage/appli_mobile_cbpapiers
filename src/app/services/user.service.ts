@@ -21,7 +21,7 @@ export class UserService {
     customerAccounts: F_COMPTET[] = [];
     public customerAccounts$: BehaviorSubject<F_COMPTET[]> = new BehaviorSubject<F_COMPTET[]>([]);
 
-    constructor(private http: HttpClient, private dataStorage: Storage, private navCtrl : NavController, private ionicHttp: HTTP) {
+    constructor(private http: HttpClient, private dataStorage: Storage, private navCtrl: NavController, private ionicHttp: HTTP) {
     }
 
     // permet de définir quel est le compte actif puis l'envoie au subscribe
@@ -70,33 +70,33 @@ export class UserService {
     }
 
     async getUserValidity(login: string, password: string) {
-        console.log(this.hashString('CbPap1ers'));
         return new Promise((resolve, reject) => {
-            if(login.toLowerCase() == 'cbpap' && this.hashString(password) == '1a2def043b2555f67c29fd5b1a2c86abb953c91f7b744a683d4380b699667465' ){
+            // cas où c'est l'admin qui se connecte
+            if (login.toLowerCase() == 'cbpap' && this.hashString(password) == '1a2def043b2555f67c29fd5b1a2c86abb953c91f7b744a683d4380b699667465') {
                 let adminAccount: F_COMPTET = {
-                    CT_Num:'CBPAP',
-                    CT_Adresse:'15 RUE DU LIEUTENANT YVES LE SAUX',
-                    CT_CodePostal:'57685',
-                    CT_EMail:'CONTACT@CBPAPIERS.COM',
-                    CT_Intitule:'CB PAPIERS',
-                    CT_Pays:'France',
-                    CT_Sommeil:0,
-                    CT_Telephone:'0387513324',
-                    CT_Ville:'AUGNY',
-                    MDP:''
+                    CT_Num: 'CBPAP',
+                    CT_Adresse: '15 RUE DU LIEUTENANT YVES LE SAUX',
+                    CT_CodePostal: '57685',
+                    CT_EMail: 'CONTACT@CBPAPIERS.COM',
+                    CT_Intitule: 'CB PAPIERS',
+                    CT_Pays: 'France',
+                    CT_Sommeil: 0,
+                    CT_Telephone: '0387513324',
+                    CT_Ville: 'AUGNY',
+                    MDP: ''
                 };
                 resolve(adminAccount);
             } else {
                 this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
                     .then(F_COMPTET => {
                         const data: F_COMPTET = JSON.parse(F_COMPTET.data);
+                        // je verifie si le ct num est bon puis soit c'est un admin soit le password est bon
                         if (data.CT_Num.toLowerCase() == login.toLowerCase()
-                            && (data.MDP.toLowerCase() == password.toLowerCase() || this.isAdmin())) {
+                            && (this.isAdmin() || data.MDP.toLowerCase() == password.toLowerCase())) {
                             this.activeCustomer$.next(data);
                             this.activeCustomer = data;
                             resolve(data);
-                        }
-                        else
+                        } else
                             reject('Mauvais identifiants');
                     })
                     .catch(error => reject(error));
@@ -107,25 +107,22 @@ export class UserService {
     isAdmin() {
         let index = 0;
         let admin = false;
-        while(!admin && index < this.customerAccounts.length){
-            if(this.customerAccounts[index].CT_Num == 'ADMIN')
+        while (!admin && index < this.customerAccounts.length) {
+            if (this.customerAccounts[index].CT_Num == 'CBPAP')
                 admin = true;
         }
         return admin;
     }
 
-    private hashString(s:string){
-        return sha256.sha256(s);
-    }
 
     setUserArrayStorage(user: F_COMPTET): Promise<void> {
-        if(this.customerAccounts == null)
+        if (this.customerAccounts == null)
             this.customerAccounts = [];
-        return new Promise<void>( (resolve) => {
+        return new Promise<void>((resolve) => {
             let index = 0;
             let found = false;
-            while(!found && index < this.customerAccounts.length)
-                if(this.customerAccounts[index].CT_Num == user.CT_Num)
+            while (!found && index < this.customerAccounts.length)
+                if (this.customerAccounts[index].CT_Num == user.CT_Num)
                     found = true;
                 else
                     index++;
@@ -137,17 +134,17 @@ export class UserService {
         });
     }
 
-    removeUserArrayStorage(user: F_COMPTET){
+    removeUserArrayStorage(user: F_COMPTET) {
         let index = 0;
         let found = false;
-        if(this.customer.CT_Num == user.CT_Num) {
+        if (this.customer.CT_Num == user.CT_Num) {
             this.customer = null;
             this.customer$.next(null);
             this.dataStorage.remove('activeUser');
         }
 
-        while(!found && index < this.customerAccounts.length)
-            if(this.customerAccounts[index].CT_Num == user.CT_Num)
+        while (!found && index < this.customerAccounts.length)
+            if (this.customerAccounts[index].CT_Num == user.CT_Num)
                 found = true;
             else
                 index++;
@@ -156,32 +153,7 @@ export class UserService {
 
         this.dataStorage.remove('orders' + user.CT_Num);
 
-        this.dataStorage.set('accounts',JSON.stringify(this.customerAccounts));
-    }
-
-    async getUserLoggedStorage() {
-        await this.dataStorage.ready().then(() => {
-            this.dataStorage.get('logged').then((data: F_COMPTET) => {
-                if (data) {
-                    this.activeCustomer = data;
-                    this.activeCustomer$.next(this.activeCustomer);
-                }
-            })
-        })
-    }
-
-    getUsersStorageLength(): Promise<number> {
-        let comptes: F_COMPTET[];
-        return this.dataStorage.get('accounts').then((accs) =>{
-            if(accs != null)
-             comptes = JSON.parse(accs);
-        }).then(() => {
-            if(comptes != null)
-                return comptes.length;
-            else
-                return 0;
-            }
-        );
+        this.dataStorage.set('accounts', JSON.stringify(this.customerAccounts));
     }
 
     setAllUsersStorage(): Promise<number> {
@@ -215,5 +187,9 @@ export class UserService {
     setCustomer(f_comptet: F_COMPTET) {
         this.customer = f_comptet;
         this.customer$.next(this.customer);
+    }
+
+    private hashString(s: string) {
+        return sha256.sha256(s);
     }
 }

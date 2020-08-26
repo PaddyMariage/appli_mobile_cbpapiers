@@ -32,10 +32,7 @@ export class LoginPage implements OnInit{
             // Je vérifie que le storage n'est pas vide une fois le storage prêt
             this.storage.ready().then(async () => {
                 this.userService.initActiveUserFromStorage().then(() =>{
-                    console.log('initActive()');
                     this.userService.initAllUsersFromStorage().then(() => {
-                        console.log('initAllUsers()');
-                        console.log(this.userService.getCustomerAccounts());
                         if(this.userService.getActiveCustomer() != null)
                             this.router.navigateByUrl('/nav/article');
                         else
@@ -117,11 +114,10 @@ export class LoginPage implements OnInit{
         else {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
                 this.userService.setUserArrayStorage(account).then(() => {
-                    this.router.navigateByUrl('/nav/article');
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
-            }).catch((data:string) => {
-                    this.error = data;
+            }).catch((error:string) => {
+                    this.error = error;
                 }
             );
         }
