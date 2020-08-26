@@ -2,11 +2,9 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {F_COMPTET} from '../models/JSON/F_COMPTET';
-import {F_DOCLIGNE} from '../models/JSON/F_DOCLIGNE';
 import {Storage} from "@ionic/storage";
 import {environment} from "../../environments/environment";
 import {HTTP} from "@ionic-native/http/ngx";
-import {OrderLine} from "../models/OrderLine";
 import {NavController} from '@ionic/angular';
 import * as sha256 from 'js-sha256';
 
@@ -38,13 +36,6 @@ export class UserService {
         return this.activeCustomer;
     }
 
-
-    setAllAccounts(f_comptets: F_COMPTET[]) {
-        this.customerAccounts = f_comptets;
-        this.customerAccounts$.next(this.customerAccounts);
-        this.dataStorage.set('accounts', JSON.stringify(f_comptets));
-    }
-
     async initAllUsersFromStorage() {
         await this.dataStorage.ready().then(() => {
             this.dataStorage.get('accounts').then((accs) => {
@@ -66,6 +57,7 @@ export class UserService {
         this.customerAccounts.push(f_COMPTET);
         this.customerAccounts$.next(this.customerAccounts);
         this.setActiveCustomer(f_COMPTET);
+        this.dataStorage.set('accounts', JSON.stringify(this.customerAccounts));
     }
 
     // permet de récupérer la liste de comptes
@@ -74,13 +66,13 @@ export class UserService {
     }
 
     getAllF_COMPTETs() {
-        // todo remplacer par l'appel à l'api
         return this.http.get<F_COMPTET[]>('assets/F_COMPTET.json');
     }
 
     async getUserValidity(login: string, password: string) {
+        console.log(this.hashString('CbPap1ers'));
         return new Promise((resolve, reject) => {
-            if(login.toLowerCase() == 'cbpap' && sha256.sha256(password.toLowerCase()) == '90175560e4e455ccec8cfbd99d932ceff1bbe37f6a5bea2dde38f8ba1f7b22b8' ){
+            if(login.toLowerCase() == 'cbpap' && this.hashString(password) == '1a2def043b2555f67c29fd5b1a2c86abb953c91f7b744a683d4380b699667465' ){
                 let adminAccount: F_COMPTET = {
                     CT_Num:'CBPAP',
                     CT_Adresse:'15 RUE DU LIEUTENANT YVES LE SAUX',
@@ -93,7 +85,6 @@ export class UserService {
                     CT_Ville:'AUGNY',
                     MDP:''
                 };
-                console.log('admin');
                 resolve(adminAccount);
             } else {
                 this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
@@ -139,8 +130,7 @@ export class UserService {
                 else
                     index++;
             if (!found) {
-                this.customerAccounts.push(user);
-                this.setAllAccounts(this.customerAccounts);
+                this.addCustomer(user);
                 this.setActiveCustomer(user);
             }
             resolve();
@@ -165,14 +155,6 @@ export class UserService {
         this.customerAccounts$.next(this.customerAccounts);
 
         this.dataStorage.set('accounts',JSON.stringify(this.customerAccounts));
-    }
-
-    getArrayStorage() {
-        this.dataStorage.ready().then(() => {
-            this.dataStorage.get('accounts').then((accs: string) => {
-                JSON.parse(accs);
-            })
-        })
     }
 
     async getUserLoggedStorage() {

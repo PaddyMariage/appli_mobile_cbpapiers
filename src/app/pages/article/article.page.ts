@@ -94,19 +94,16 @@ export class ArticlePage implements OnInit, OnDestroy {
         )
             .catch(error => console.log(error))
             .finally(() => {
-                console.log(this.orderLineList);
                 this.initAllInfos(this.orderLineList)
             });
     }
 
     private async initAllInfos(orderLineList: OrderLine[]) {
-        console.log('in initAllInfos()');
         await this.articleService.getArtClients(orderLineList, this.customer.CT_Num).then(
             (orderLineList_Updated: OrderLine[]) => this.orderLineList = orderLineList_Updated
         ).finally(() => {
             this.initAllPrices_Error(this.orderLineList);
         });
-
     }
 
     private async initAllPrices_Error(orderLineList: OrderLine[]) {
@@ -134,7 +131,6 @@ export class ArticlePage implements OnInit, OnDestroy {
     }
 
     private async initAllPrices(orderLineList: OrderLine[]) {
-        console.log('in initAllPrices()');
         await this.articleService.getF_ARTICLE(orderLineList).then(
             (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
         )
