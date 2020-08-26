@@ -47,7 +47,6 @@ export class OrderService {
     // Permet d'initialiser la liste d'historique à partir du storage et renvoie les commmandes appartenant à un compte.
     initAndGetOrdersStorage(){
         this.ordersActive = [];
-        console.log('init orders');
         this.dataStorage.ready().then(() => {
             this.dataStorage.get('orders' + this.userService.getActiveCustomer().CT_Num).then((orders) => {
                 if(orders != null) {
@@ -82,6 +81,7 @@ export class OrderService {
                 index++;
         }
         this.dataStorage.set('orders' + this.userService.getActiveCustomer().CT_Num, this.ordersActive);
+        this.ordersActive$.next(this.ordersActive);
     }
 }
 

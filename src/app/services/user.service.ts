@@ -154,6 +154,8 @@ export class UserService {
         this.customerAccounts.splice(index, 1);
         this.customerAccounts$.next(this.customerAccounts);
 
+        this.dataStorage.remove('orders' + user.CT_Num);
+
         this.dataStorage.set('accounts',JSON.stringify(this.customerAccounts));
     }
 
