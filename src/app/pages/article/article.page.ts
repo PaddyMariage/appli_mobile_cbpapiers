@@ -23,10 +23,13 @@ export class ArticlePage implements OnInit, OnDestroy {
     orderLineBackup: OrderLine[] = [];
     totalQuantity: number;
     customer: F_COMPTET;
-    loading: HTMLIonLoadingElement;
     cartSub: Subscription;
     orderLineSub: Subscription;
     activeCustomerSub: Subscription;
+    error: string = '';
+    errorBol: boolean = false;
+    loading: HTMLIonLoadingElement;
+    $event: any
 
     constructor(private modalController: ModalController,
                 private cartService: CartService,
@@ -75,6 +78,16 @@ export class ArticlePage implements OnInit, OnDestroy {
         this.loadingController.dismiss(this);
     }
 
+    doRefresh($event: any) {
+        this.$event = $event;
+        this.presentLoading();
+        this.initAllPrices(this.orderLineList);
+    }
+
+    endRefresh() {
+        this.$event.target.complete();
+    }
+
     private async initTopF_ARTICLE() {
         await this.articleService.getDocLignes(this.customer.CT_Num).then(
             (orderLines: OrderLine[]) => this.cartService.initOrderLinesList(orderLines)
@@ -100,11 +113,24 @@ export class ArticlePage implements OnInit, OnDestroy {
         console.log('in initAllPrices()');
         await this.articleService.getF_ARTICLE(orderLineList).then(
             (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
-        ).finally(() => {
-            console.log(this.orderLineList);
-            this.cartService.initOrderLinesList(this.orderLineList);
-            this.dismissLoading();
-        });
+        )
+            .catch( error =>  {
+                this.error = error;
+                this.errorBol = true;
+                this.dismissLoading();
+                console.log(error);
+            })
+            .finally(() => {
+
+                if (this.errorBol) {
+                    this.error = '';
+                    this.errorBol = false;
+                    this.endRefresh();
+                }
+                this.cartService.initOrderLinesList(this.orderLineList);
+                this.dismissLoading();
+                this.endRefresh();
+            });
     }
 
 

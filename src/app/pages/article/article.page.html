@@ -1,9 +1,13 @@
 <app-header></app-header>
 <ion-content>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
     <!--Debounce permet d'attendre un certain temps avant le dernier input pour pas faire 458 requêtes
     $event sert à récolter les inputs et a les envoyer dans un objet de type DOM event (https://angular.io/guide/user-input)-->
     <ion-searchbar showCancelButton="focus" debounce="500" (ionChange)="getArticleSearched($event)"
                    animated placeholder="Rechercher..." class="searchbar"></ion-searchbar>
+    <div class="red"> test: {{error}} </div>
     <ion-list>
         <ion-list-header>
             <ion-label><strong>Mes produits favoris :</strong></ion-label>
