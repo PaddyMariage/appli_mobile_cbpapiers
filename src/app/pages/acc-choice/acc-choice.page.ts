@@ -39,7 +39,7 @@ export class AccChoicePage implements OnDestroy {
         this.navCtrl.navigateBack(['/nav/article']);
     }
 
-    // on indique simplement le compte que l'on va récupérer dans la page des options
+    // on indique le compte que l'on va récupérer dans la page des options
     goToSettings(compte: F_COMPTET) {
         this.userService.setCustomer(compte);
         this.navCtrl.navigateForward(['/acc-choice/settings']);

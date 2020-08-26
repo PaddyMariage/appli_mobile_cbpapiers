@@ -21,21 +21,21 @@ export class AddAccPage {
     }
 
     async addAccountAndRedirect() {
-        if(this.login == '' || this.login == null)
-            if(this.password == '' || this.password == null)
+        if (this.login == '' || this.login == null)
+            if (this.password == '' || this.password == null)
                 this.error = 'Veuillez entrer un identifiant & mot de passe';
             else
                 this.error = 'Veuillez entrer un identifiant';
-        else if((this.password == '' || this.password == null) && !this.userService.isAdmin())
+        else if (!this.userService.isAdmin() && (this.password == '' || this.password == null)) {
             this.error = 'Veuillez entrer un mot de passe';
+        }
         else {
-            await this.userService.getUserValidity(this.login, this.password).then((account:F_COMPTET) => {
+            await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
                 this.userService.setUserArrayStorage(account).then(() => {
-                    console.log('navigateforward()');
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
-            }).catch((data) => {
-                    this.error = data;
+            }).catch((error:string) => {
+                    this.error = error;
                 }
             );
         }
