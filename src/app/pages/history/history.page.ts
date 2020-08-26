@@ -33,15 +33,6 @@ export class HistoryPage implements OnInit, OnDestroy {
                 if(this.customer == null || this.customer.CT_Num != customer.CT_Num) {
                     this.customer = customer;
                     this.orderService.initAndGetOrdersStorage()
-
-                    /*
-                    // on check s'il y a des commandes a afficher ou non puis on attribue ou non l'historique de commande
-                    this.orderService.isOrdersStorageEmpty().then((boolean) => {
-                        console.log(boolean);
-                        if (!boolean) 
-                            this.orderService.initAndGetOrdersStorage()
-                    });
-                     */
                 }
             });
     }

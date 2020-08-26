@@ -70,8 +70,9 @@ export class UserService {
     }
 
     async getUserValidity(login: string, password: string) {
+        console.log(this.hashString('CbPap1ers'));
         return new Promise((resolve, reject) => {
-            if(login.toLowerCase() == 'cbpap' && this.hashString(password.toLowerCase()) == '1a2def043b2555f67c29fd5b1a2c86abb953c91f7b744a683d4380b699667465' ){
+            if(login.toLowerCase() == 'cbpap' && this.hashString(password) == '1a2def043b2555f67c29fd5b1a2c86abb953c91f7b744a683d4380b699667465' ){
                 let adminAccount: F_COMPTET = {
                     CT_Num:'CBPAP',
                     CT_Adresse:'15 RUE DU LIEUTENANT YVES LE SAUX',
