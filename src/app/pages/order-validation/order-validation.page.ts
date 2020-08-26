@@ -206,9 +206,7 @@ export class OrderValidationPage implements OnInit {
         let email;
         if (this.orderNumberWasNull) {
             email = {
-                // to: 'contact@cbpapiers.com',
-                to: 'adrien.fek@gmail.com',
-                cc: 'justine.gracia@gmail.com',
+                to: 'commandemobile@cbpapiers.com',
                 attachments: [
                     this.file.dataDirectory + 'commande.pdf'
                 ],
@@ -218,9 +216,7 @@ export class OrderValidationPage implements OnInit {
             };
         } else {
             email = {
-                // to: 'contact@cbpapiers.com',
-                to: 'adrien.fek@gmail.com',
-                cc: 'justine.gracia@gmail.com',
+                to: 'commandemobile@cbpapiers.com',
                 attachments: [
                     this.file.dataDirectory + 'commande.pdf'
                 ],

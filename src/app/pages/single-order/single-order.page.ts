@@ -249,12 +249,11 @@ export class SingleOrderPage implements OnInit, OnDestroy {
       sendMail(){
           const email = {
               // to: 'contact@cbpapiers.com',
-              to: 'adrien.fek@gmail.com',
-              cc: 'justine.gracia@gmail.com',
+              to: 'commandemobile@cbpapiers.com',
               attachments: [
                   this.file.dataDirectory + 'annulation.pdf'
               ],
-          subject: 'ANNULATION COMMANDE N°: ' + this.order.orderNumber + ' | REFCLIENT : ' + this.userService.getActiveCustomer().CT_Num,
+          subject: 'ANNULATION COMMANDE N° ' + this.order.orderNumber + ' | REFCLIENT : ' + this.userService.getActiveCustomer().CT_Num,
               body: 'ATTENTION ANNULATION',
               isHtml: true
           };
