@@ -9,6 +9,7 @@ import {Order} from "../../models/Order";
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
 import {Storage} from "@ionic/storage";
 import {Subscription} from "rxjs";
+import {Article} from "../../models/Article";
 
 @Component({
     selector: 'app-articles',
@@ -113,18 +114,19 @@ export class ArticlePage implements OnInit, OnDestroy {
                 this.dismissLoading();
                 this.error = error;
                 this.errorBol = true;
-        });
+            });
     }
 
     private initAllPrices(orderLineList: OrderLine[]) {
         this.articleService.getF_ARTICLE(orderLineList)
             .then((orderLineList_Final: OrderLine[]) => {
                 this.orderLineList = orderLineList_Final;
+                this.orderLineBackup = this.orderLineList;
                 this.error = '';
                 this.errorBol = false;
                 this.dismissLoading();
             })
-            .catch( error =>  {
+            .catch(error => {
                 this.error = error;
                 this.errorBol = true;
                 this.dismissLoading();
@@ -145,19 +147,24 @@ export class ArticlePage implements OnInit, OnDestroy {
         let orderLines = this.getOrderLines();
         // set la valeur de l'input de la searchbar dans "val". On indique que c'est un input html
         const val = (ev.target as HTMLInputElement).value;
+        console.log(val);
 
         // si rien n'est mis on affiche tout, sinon on filtre avec ce qui a été inséré
         if (val && val.trim() !== '') {
 
             // on manipule et filtre l'objet
             orderLines = orderLines.filter((orderLine) => {
+                console.log(orderLine.article.reference.toLowerCase().indexOf(val.toLowerCase()) > -1);
                 return (orderLine.article.reference.toLowerCase().indexOf(val.toLowerCase()) > -1 ||
                     orderLine.article.label.toLowerCase().indexOf(val.toLowerCase()) > -1);
             });
         }
 
         // on l'envoie à l'observable pour que la page se mette à jour
-        this.cartService.setOrderLineList(orderLines);
+        // la raison pour laquelle la quantité ne revient pas à 0 est probablement dûe
+        // au fait que le select est initialité à la création de la page
+        // et modifié seulement si ionChange est appelé dans le template
+        this.cartService.filterOrderLineList(orderLines);
     }
 
     async createOrderLineDetails(orderLine: OrderLine) {
