@@ -22,7 +22,6 @@ export class HistoryPage implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-
         this.orderActiveSub = this.orderService.ordersActive$.subscribe(
             orders => {
                 this.history = orders;
@@ -33,12 +32,16 @@ export class HistoryPage implements OnInit, OnDestroy {
                 // on met à jour le customer s'il est null ou différent de celui actif. Puis on retest l'historique
                 if(this.customer == null || this.customer.CT_Num != customer.CT_Num) {
                     this.customer = customer;
+                    this.orderService.initAndGetOrdersStorage()
+
+                    /*
                     // on check s'il y a des commandes a afficher ou non puis on attribue ou non l'historique de commande
                     this.orderService.isOrdersStorageEmpty().then((boolean) => {
                         console.log(boolean);
                         if (!boolean) 
                             this.orderService.initAndGetOrdersStorage()
                     });
+                     */
                 }
             });
     }

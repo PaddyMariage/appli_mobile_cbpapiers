@@ -10,7 +10,7 @@ import { NavController } from '@ionic/angular';
     templateUrl: './add-acc.page.html',
     styleUrls: ['./add-acc.page.scss'],
 })
-export class AddAccPage implements OnInit {
+export class AddAccPage {
 
     login: string;
     password: string;
@@ -18,9 +18,6 @@ export class AddAccPage implements OnInit {
 
     constructor(private userService: UserService,
                 private navCtrl : NavController) {
-    }
-
-    ngOnInit() {
     }
 
     async addAccountAndRedirect() {
@@ -34,6 +31,7 @@ export class AddAccPage implements OnInit {
         else {
             await this.userService.getUserValidity(this.login, this.password).then((account:F_COMPTET) => {
                 this.userService.setUserArrayStorage(account).then(() => {
+                    console.log('navigateforward()');
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
             }).catch((data) => {

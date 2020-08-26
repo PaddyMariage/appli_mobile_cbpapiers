@@ -25,7 +25,6 @@ export class AccChoicePage implements OnDestroy {
             this.customer = data;
         });
         this.customer = this.userService.getActiveCustomer();
-        console.log(this.customer);
         this.userService.customerAccounts$.subscribe(data => {
             this.accounts = data;
         });

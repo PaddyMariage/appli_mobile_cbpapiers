@@ -50,18 +50,9 @@ export class OrderService {
 
     isOrdersStorageEmpty() : Promise<boolean> {
         return this.dataStorage.ready().then(() => {
-            console.log('orders' + this.userService.getActiveCustomer().CT_Num);
-            
             return this.dataStorage.get('orders' + this.userService.getActiveCustomer().CT_Num).then((val) => {
                 let valueArray : Order[] = JSON.parse(val);
-                console.log(valueArray);
-                // Todo : même si c'est null ça rend false, savoir pourquoi
-                // Si c'est faux il y au moins une commande, sinon c'est vide
-                if (valueArray == null || valueArray == []) {
-                    return true;
-                }
-                else
-                    return false;
+                return valueArray == null || valueArray == [];
             }) 
         })
     }
@@ -69,13 +60,16 @@ export class OrderService {
     // Permet d'initialiser la liste d'historique à partir du storage et renvoie les commmandes appartenant à un compte.
     initAndGetOrdersStorage(){
         this.ordersActive = [];
-        console.log('init');
+        console.log('init orders');
         this.dataStorage.ready().then(() => {
             this.dataStorage.get('orders' + this.userService.getActiveCustomer().CT_Num).then((orders) => {
-                let ordersTotal : Order[] = JSON.parse(orders);
-                console.log(ordersTotal);
-                ordersTotal.sort((a,b) => (b.orderDate.valueOf() - a.orderDate.valueOf()));
-                this.setActiveOrders(ordersTotal);
+                if(orders != null) {
+                    let ordersTotal: Order[] = JSON.parse(orders);
+                    ordersTotal.sort((a, b) => (new Date(b.orderDate).valueOf() - new Date(a.orderDate).valueOf()));
+                    this.setActiveOrders(ordersTotal);
+                } else {
+                    this.ordersActive = [];
+                }
             });
         });
     }

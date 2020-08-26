@@ -29,7 +29,10 @@ export class LoginPage implements OnInit{
             // Je vérifie que le storage n'est pas vide une fois le storage prêt
             this.storage.ready().then(async () => {
                 this.userService.initActiveUserFromStorage().then(() =>{
+                    console.log('initActive()');
                     this.userService.initAllUsersFromStorage().then(() => {
+                        console.log('initAllUsers()');
+                        console.log(this.userService.getCustomerAccounts());
                         if(this.userService.getActiveCustomer() != null)
                             this.router.navigateByUrl('/nav/article');
                         else
@@ -39,7 +42,6 @@ export class LoginPage implements OnInit{
                 });
             });
         });
-
 
         // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
         // la méthode. Si l'url est similaire a la page de login et si c'est vide, redirige vers la liste
@@ -52,7 +54,7 @@ export class LoginPage implements OnInit{
     }
 
     ngOnInit(): void {
-        // this.storage.clear();
+        //this.storage.clear();
     }
 
 
@@ -75,8 +77,6 @@ export class LoginPage implements OnInit{
         // on ne va pas utiliser de set mais un systeme d'ajout/suppresion de compte. Ici, il est ajouté
         this.userService.addCustomer(compte);
         this.userService.setActiveCustomer(compte);
-        // p-e a delete suite aux chgt authguard ( je check plus tard )
-        this.storage.set('logged', 'logged');
         this.navCtrl.navigateForward(['/nav/article']);
     }
 

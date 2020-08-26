@@ -14,7 +14,6 @@ import { OrderValidationPage } from './order-validation.page';
     FormsModule,
     IonicModule,
     OrderValidationPageRoutingModule
-  ],
-  declarations: [OrderValidationPage]
+  ]
 })
 export class OrderValidationPageModule {}

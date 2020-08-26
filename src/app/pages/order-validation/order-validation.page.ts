@@ -85,7 +85,6 @@ export class OrderValidationPage implements OnInit {
 
     checkEditOrderOrNot(){
         if (this.order.orderNumber == null){
-            console.log("Commande non présente");
             this.order =
                 {
                     // numéro de commande généré dans le service generateID
@@ -96,7 +95,6 @@ export class OrderValidationPage implements OnInit {
                 };
             this.sendPdf();
         } else {
-            console.log("Commande déjà présente");
             this.order = this.cartService.getCart();
             this.sendPdfEdit();
         }
@@ -295,7 +293,6 @@ export class OrderValidationPage implements OnInit {
         this.cartService.resetCart();
         this.warehouseRetService.setStatus(false);
         this.onDismiss();
-        console.log("Delete effectué");
     }
 
 }
