@@ -107,13 +107,13 @@ export class UserService {
     isAdmin() {
         let index = 0;
         let admin = false;
-        while (!admin && index < this.customerAccounts.length) {
-            if (this.customerAccounts[index].CT_Num == 'CBPAP')
-                admin = true;
-        }
+        if(this.customerAccounts != null)
+            while (!admin && index < this.customerAccounts.length) {
+                if (this.customerAccounts[index].CT_Num == 'CBPAP')
+                    admin = true;
+            }
         return admin;
     }
-
 
     setUserArrayStorage(user: F_COMPTET): Promise<void> {
         if (this.customerAccounts == null)
