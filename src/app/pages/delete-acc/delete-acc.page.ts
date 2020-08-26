@@ -31,7 +31,7 @@ export class DeleteAccPage implements OnInit {
                 this.error = 'Veuillez entrer un identifiant & mot de passe';
             else
                 this.error = 'Veuillez entrer un identifiant';
-        else if (this.password == '' || this.password == null) {
+        else if (!this.userService.isAdmin() && (this.password == '' || this.password == null)) {
             this.error = 'Veuillez entrer un mot de passe';
         }
         else {
