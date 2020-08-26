@@ -104,9 +104,33 @@ export class ArticlePage implements OnInit, OnDestroy {
         await this.articleService.getArtClients(orderLineList, this.customer.CT_Num).then(
             (orderLineList_Updated: OrderLine[]) => this.orderLineList = orderLineList_Updated
         ).finally(() => {
-            this.initAllPrices(this.orderLineList);
+            this.initAllPrices_Error(this.orderLineList);
         });
 
+    }
+
+    private async initAllPrices_Error(orderLineList: OrderLine[]) {
+        console.log('in initAllPrices()');
+        await this.articleService.getF_ARTICLE_Error(orderLineList).then(
+            (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
+        )
+            .catch( error =>  {
+                this.error = error;
+                this.errorBol = true;
+                this.dismissLoading();
+                console.log(error);
+            })
+            .finally(() => {
+
+                if (this.errorBol) {
+                    this.error = '';
+                    this.errorBol = false;
+                    this.endRefresh();
+                }
+                this.cartService.initOrderLinesList(this.orderLineList);
+                this.dismissLoading();
+                this.endRefresh();
+            });
     }
 
     private async initAllPrices(orderLineList: OrderLine[]) {
