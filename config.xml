@@ -3,7 +3,7 @@
     <name>Cbpapiers</name>
     <description>Une application qui veut du bien a ses clients</description>
     <author email="contact@cbpapiers.com" href="http://cbpapiers.com/">Cbpapiers</author>
-    <content original-src="index.html" src="http://localhost:8100" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -11,9 +11,6 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
-    <preference name="KeyboardResize" value="true" />
-    <preference name="KeyboardResizeMode" value="native" />
-    <preference name="resizeOnFullScreen" value="true" />
     <preference name="ScrollEnabled" value="false" />
     <preference name="android-minSdkVersion" value="19" />
     <preference name="BackupWebStorage" value="none" />

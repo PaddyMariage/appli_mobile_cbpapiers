@@ -54,7 +54,7 @@ export class ArticleService {
         // on instancie et initialise notre tableau d'OrderLine
         let orderLines: OrderLine[] = [];
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             this.ionicHttp.get(environment.doclignesURL + CT_Num, {}, {})
                 .then(F_DOCLIGNE => {
 
@@ -112,7 +112,7 @@ export class ArticleService {
                     resolve(orderLines);
                 })
                 .catch(error => {
-                    console.log(error);
+                    reject('une erreur est survenue, veuillez recharger la page')
                 });
         });
     }
@@ -128,7 +128,7 @@ export class ArticleService {
      */
 
     getArtClients(orderLineList: OrderLine[], CT_Num: string) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             this.ionicHttp.get(environment.artClientsURL + CT_Num, {}, {})
                 .then(F_ARTCLIENT => {
                     const F_ARTCLIENTS: F_ARTCLIENT[] = JSON.parse(F_ARTCLIENT.data);
@@ -156,11 +156,9 @@ export class ArticleService {
                             }
                         }
                     }
-                })
-                .catch(error => console.error(error))
-                .finally(() => {
                     resolve(orderLineList);
-                });
+                })
+                .catch(error => reject('une erreur est survenue, veuillez recharger la page'));
         });
     }
 
@@ -181,70 +179,6 @@ export class ArticleService {
      *
      * On récupère aussi les libellés des articles.
      **/
-
-    getF_ARTICLE_Error(orderLineList: OrderLine[]) {
-
-        // on crée une liste "finale" afin de trier les articles dont le prix ne sera pas calculé
-        // car la requête au webservice peut ne pas retourner certains articles suite à un filtre effectué
-        // dans le backend
-        let orderLineList_Final: OrderLine[] = [];
-
-        return new Promise((resolve, reject) => {
-            this.ionicHttp.get(environment.articlesURL + '/test-error', {}, {})
-                .then((F_ARTICLE) => {
-                    const F_ARTICLES: F_ARTICLE[] = JSON.parse(F_ARTICLE.data);
-
-                    for (const orderline of orderLineList) {
-
-                        for (const article of F_ARTICLES) {
-
-                            // s'il y a correspondance et que la référence est différente de FC (qui n'est pas un article)
-                            if (orderline.article.reference == article.AR_Ref.trim() && article.AR_Ref != 'FC') {
-
-                                // on règle les prix selon les situations décrites plus haut
-                                const AC_PrixVen = orderline.article.AC_PrixVen;
-                                const AC_Remise = orderline.article.AC_Remise;
-
-                                if (AC_PrixVen != 0 && AC_Remise != 0)
-                                    orderline.article.unitPrice =
-                                        Math.ceil(
-                                            AC_PrixVen * (1 - AC_Remise / 100) * 100
-                                        ) / 100;
-
-                                else if (AC_PrixVen != 0 && AC_Remise == 0)
-                                    orderline.article.unitPrice =
-                                        Math.ceil(AC_PrixVen * 100) / 100;
-
-                                else if (AC_PrixVen == 0 && AC_Remise != 0)
-                                    orderline.article.unitPrice =
-                                        Math.ceil(
-                                            article.AR_PrixVen * (1 - AC_Remise / 100) * 100
-                                        ) / 100;
-
-                                else
-                                    orderline.article.unitPrice =
-                                        Math.ceil(article.AR_PrixVen * 100) / 100;
-
-                                // on récup le libellé des articles au passage aussi
-                                orderline.article.label = article.AR_Design;
-
-                                // après avoir calculé le prix, on met l'article dans la liste "finale"
-                                orderLineList_Final.push(orderline);
-                            }
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log('oops');
-                    console.log(error)
-                    reject('une erreur est survenue, veuillez recharger la page en swipant de haut en bas')
-
-                })
-                // on retourne la liste "finale"
-                .finally(() => resolve(orderLineList_Final));
-
-        });
-    }
 
     getF_ARTICLE(orderLineList: OrderLine[]) {
 
@@ -297,16 +231,12 @@ export class ArticleService {
                             }
                         }
                     }
+                    // on retourne la liste "finale"
+                    resolve(orderLineList_Final);
                 })
                 .catch(error => {
-                    console.log('oops');
-                    console.log(error)
-                    reject('une erreur est survenue, veuillez recharger la page en swipant de haut en bas')
-
+                    reject('une erreur est survenue, veuillez recharger la page')
                 })
-                // on retourne la liste "finale"
-                .finally(() => resolve(orderLineList_Final));
-
         });
     }
 }

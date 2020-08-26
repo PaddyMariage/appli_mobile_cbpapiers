@@ -71,36 +71,21 @@ export class UserService {
 
     async getUserValidity(login: string, password: string) {
         return new Promise((resolve, reject) => {
-            // cas où c'est l'admin qui se connecte
-            if (login.toLowerCase() == 'cbpap' && this.hashString(password) == '1a2def043b2555f67c29fd5b1a2c86abb953c91f7b744a683d4380b699667465') {
-                let adminAccount: F_COMPTET = {
-                    CT_Num: 'CBPAP',
-                    CT_Adresse: '15 RUE DU LIEUTENANT YVES LE SAUX',
-                    CT_CodePostal: '57685',
-                    CT_EMail: 'CONTACT@CBPAPIERS.COM',
-                    CT_Intitule: 'CB PAPIERS',
-                    CT_Pays: 'France',
-                    CT_Sommeil: 0,
-                    CT_Telephone: '0387513324',
-                    CT_Ville: 'AUGNY',
-                    MDP: ''
-                };
-                resolve(adminAccount);
-            } else {
                 this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
                     .then(F_COMPTET => {
                         const data: F_COMPTET = JSON.parse(F_COMPTET.data);
+                        console.log(data);
                         // je verifie si le ct num est bon puis soit c'est un admin soit le password est bon
-                        if (data.CT_Num.toLowerCase() == login.toLowerCase()
-                            && (this.isAdmin() || data.MDP.toLowerCase() == password.toLowerCase())) {
+                        if (data.CT_Num.toLowerCase() == login.toLowerCase() && data.MDP.toLowerCase() == password.toLowerCase()) {
                             this.activeCustomer$.next(data);
                             this.activeCustomer = data;
                             resolve(data);
                         } else
                             reject('Mauvais identifiants');
                     })
-                    .catch(error => reject(error));
-            }
+                    .catch(error => {
+                        reject(error);
+                    });
         });
     }
 

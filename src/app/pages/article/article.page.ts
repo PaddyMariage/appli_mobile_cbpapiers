@@ -27,9 +27,9 @@ export class ArticlePage implements OnInit, OnDestroy {
     orderLineSub: Subscription;
     activeCustomerSub: Subscription;
     error: string = '';
-    errorBol: boolean = false;
+    errorBol: boolean;
     loading: HTMLIonLoadingElement;
-    $event: any
+
 
     constructor(private modalController: ModalController,
                 private cartService: CartService,
@@ -65,6 +65,7 @@ export class ArticlePage implements OnInit, OnDestroy {
         this.presentLoading();
     }
 
+    // fait pop une fenêtre avec un message d'attente pendant le chargement de la liste
     async presentLoading() {
         this.loading = await this.loadingController.create({
             spinner: 'lines',
@@ -74,82 +75,59 @@ export class ArticlePage implements OnInit, OnDestroy {
         await this.loading.present();
     }
 
+    // ferme cette fenêtre
     dismissLoading() {
         this.loadingController.dismiss(this);
     }
 
-    doRefresh($event: any) {
-        this.$event = $event;
+    doRefresh() {
         this.presentLoading();
-        this.initAllPrices(this.orderLineList);
+        this.initTopF_ARTICLE();
     }
 
-    endRefresh() {
-        this.$event.target.complete();
-    }
-
-    private async initTopF_ARTICLE() {
-        await this.articleService.getDocLignes(this.customer.CT_Num).then(
-            (orderLines: OrderLine[]) => this.cartService.initOrderLinesList(orderLines)
-        )
-            .catch(error => console.log(error))
-            .finally(() => {
-                this.initAllInfos(this.orderLineList)
+    private initTopF_ARTICLE() {
+        this.articleService.getDocLignes(this.customer.CT_Num)
+            .then((orderLines: OrderLine[]) => {
+                    this.cartService.initOrderLinesList(orderLines);
+                    this.error = '';
+                    this.errorBol = false;
+                    this.initAllInfos(orderLines);
+                }
+            )
+            .catch(error => {
+                this.dismissLoading();
+                this.error = error;
+                this.errorBol = true;
             });
     }
 
-    private async initAllInfos(orderLineList: OrderLine[]) {
-        await this.articleService.getArtClients(orderLineList, this.customer.CT_Num).then(
-            (orderLineList_Updated: OrderLine[]) => this.orderLineList = orderLineList_Updated
-        ).finally(() => {
-            this.initAllPrices_Error(this.orderLineList);
+    private initAllInfos(orderLineList: OrderLine[]) {
+        this.articleService.getArtClients(orderLineList, this.customer.CT_Num)
+            .then((orderLineList_Updated: OrderLine[]) => {
+                this.orderLineList = orderLineList_Updated;
+                this.initAllPrices(this.orderLineList);
+                this.errorBol = false;
+                this.error = '';
+            })
+            .catch(error => {
+                this.dismissLoading();
+                this.error = error;
+                this.errorBol = true;
         });
     }
 
-    private async initAllPrices_Error(orderLineList: OrderLine[]) {
-        console.log('in initAllPrices()');
-        await this.articleService.getF_ARTICLE_Error(orderLineList).then(
-            (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
-        )
+    private initAllPrices(orderLineList: OrderLine[]) {
+        this.articleService.getF_ARTICLE(orderLineList)
+            .then((orderLineList_Final: OrderLine[]) => {
+                this.orderLineList = orderLineList_Final;
+                this.error = '';
+                this.errorBol = false;
+                this.dismissLoading();
+            })
             .catch( error =>  {
                 this.error = error;
                 this.errorBol = true;
                 this.dismissLoading();
-                console.log(error);
-            })
-            .finally(() => {
-
-                if (this.errorBol) {
-                    this.error = '';
-                    this.errorBol = false;
-                    this.endRefresh();
-                }
-                this.cartService.initOrderLinesList(this.orderLineList);
-                this.dismissLoading();
-                this.endRefresh();
-            });
-    }
-
-    private async initAllPrices(orderLineList: OrderLine[]) {
-        await this.articleService.getF_ARTICLE(orderLineList).then(
-            (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
-        )
-            .catch( error =>  {
-                this.error = error;
-                this.errorBol = true;
-                this.dismissLoading();
-                console.log(error);
-            })
-            .finally(() => {
-
-                if (this.errorBol) {
-                    this.error = '';
-                    this.errorBol = false;
-                    this.endRefresh();
-                }
-                this.cartService.initOrderLinesList(this.orderLineList);
-                this.dismissLoading();
-                this.endRefresh();
             });
     }
 

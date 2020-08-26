@@ -134,72 +134,102 @@ export class SingleOrderPage implements OnInit, OnDestroy {
     }
 
     editOrder() {
-        // création du toast
-        // this.toastClick();
+
         // fait un deep clone des lignes de la commande
         const newCart = cloneDeep(this.order);
+
         // on met à jour les lignes du panier avec les lignes du clone de la commande
         this.cartService.setOrderLineList(newCart.orderLines);
+
         // on envoie les informations sur la commande dans le cartService afin qu'il sache qu'il s'agit d'une édition de commande
         this.cartService.updateCartInfos(newCart.orderNumber, newCart.orderDate);
+
         this.navController.navigateBack(['/nav/history']);
         this.navController.navigateBack(['/nav/article']);
     }
 
-    // génère un toast pour indiquer le transfert de panier
-    async toastClick() {
-        const toast = await this.toastController.create({
-          color: 'green',
-          position: 'top',
-          duration: 3000,
-          message: 'Commande bien transférée!'
-        });
+    header = [
+        {text: 'Reference article', style: 'tableHeader', alignment: 'center'},
+        {text: 'Quantité', style: 'tableHeader', alignment: 'center'},
+        {text: 'Prix', style: 'tableHeader', alignment: 'center'}
+    ];
 
-        await toast.present();
-      }
+    // on initialise les lignes du tableau avec le header
+    myBody = [this.header];
 
-      createPdf(){
+    // construction des lignes du tableau : pour chaque orderline récupérée du panier
+    // on ajoute cette orderline dans une ligne du tableau avec les éléments dont on a besoin :
+    // ici reference de l'article, quantité et prix final
+    // l'array myBody est donc incrémenté de nouvelles données
+    constructBody() {
+        for (const orderline of this.order.orderLines) {
+            // @ts-ignore
+            this.myBody.push([orderline.article.reference, orderline.quantity, Number(orderline.article.unitPrice * orderline.quantity).toFixed(2) + '€']);
+        }
+        return this.myBody;
+    }
+
+    createPdf() {
+        const docDefinitionPart1 = [
+            {text: 'CBPAPIERS', style: 'header'},
+            // impression de la date au format dd/mm/yyyy hh'h'mm
+            {
+                text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                alignment: 'right'
+            }
+        ];
+
+            const docDefinitionPart2 = [
+                {
+                    text: 'ATTENTION Commande ' + this.order.orderNumber
+                        + ' ' + new Date(this.order.orderDate).toLocaleDateString()  +
+                        ' ' + new Date(this.order.orderDate).toLocaleTimeString()
+                        + ' ANNULEE', style: 'subheader'
+                },
+                {text: this.userService.getActiveCustomer().CT_Intitule},
+                {text: this.userService.getActiveCustomer().CT_Adresse},
+                {text: this.userService.getActiveCustomer().CT_CodePostal + ' ' + this.userService.getActiveCustomer().CT_Ville},
+                {text: this.userService.getActiveCustomer().CT_Pays}
+            ];
+
+
+        // c'est ici qu'on construit le tableau dans le pdf :
+        // on indique le nombre de colonnes et on injecte l'array myBody construit dans la méthode constructBody()
+        const docDefinitionPart3 = [
+            {
+                style: 'tableExample',
+                table: {
+                    widths: ['*', '*', '*'],
+                    body: this.constructBody()
+                }
+            }
+        ];
+
         const docDefinition = {
-              content: [
-                  {text: 'CBPAPIERS', style: 'header'},
-                  // impression de la date au format dd/mm/yyyy hh'h'mm
-                  {
-                        /* CODE COMMENTE POUR QUE CA FONCTIONNE
-                        text: new Date().toLocaleDateString() + ' '
-                          + new Date().toLocaleTimeString(), */
-                        text : new Date(),
-                      alignment: 'right'
-                  },
-                  /* {text: 'Commande du : ' + this.order.orderDate.toLocaleDateString() + ' '
-                          + this.order.orderDate.toLocaleTimeString(), style: 'subheader'} , */
-                  {text: 'Commande du : ' + this.order.orderDate},
-                  {text: 'Ref client : ' + this.userService.getActiveCustomer().CT_Num},
-                  {text: this.userService.getActiveCustomer().CT_Intitule},
-                  {text: this.userService.getActiveCustomer().CT_Adresse},
-                  {text: 'Commande à annuler ! ! ! ', style: 'subheader'},
-              ],
-              styles: {
-                  subheader: {
-                      fontSize: 16,
-                      bold: true,
-                      margin: [0, 10, 0, 5]
-                  },
-                  tableExample: {
-                      margin: [0, 5, 0, 15]
-                  },
-                  tableHeader: {
-                      bold: true,
-                      fontSize: 13,
-                      color: 'black'
-                  }
-              },
-              defaultStyle: {
-                  alignment: 'justify'
-              }
-          };
+            watermark: 'Annulée',
+            content: [docDefinitionPart1, docDefinitionPart2, docDefinitionPart3],
+            styles: {
+                subheader: {
+                    fontSize: 16,
+                    bold: true,
+                    margin: [0, 10, 0, 5]
+                },
+                tableExample: {
+                    margin: [0, 5, 0, 15]
+                },
+                tableHeader: {
+                    bold: true,
+                    fontSize: 13,
+                    color: 'black'
+                }
+            },
+            defaultStyle: {
+                alignment: 'justify'
+            }
+        };
         this.pdfObj = pdfMake.createPdf(docDefinition);
         this.downloadPdf();
-      }
+    }
 
       downloadPdf(){
           if (this.plt.is('cordova')) {
@@ -224,8 +254,8 @@ export class SingleOrderPage implements OnInit, OnDestroy {
               attachments: [
                   this.file.dataDirectory + 'annulation.pdf'
               ],
-          subject: 'ANNULATION COMMANDE ' + ' REFCLIENT : ' + this.userService.getActiveCustomer().CT_Num ,
-              body: 'ATTENTION ANNULATION ',
+          subject: 'ANNULATION COMMANDE N°: ' + this.order.orderNumber + ' | REFCLIENT : ' + this.userService.getActiveCustomer().CT_Num,
+              body: 'ATTENTION ANNULATION',
               isHtml: true
           };
           this.emailComposer.open(email);
