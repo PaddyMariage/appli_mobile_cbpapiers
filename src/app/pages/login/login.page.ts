@@ -6,6 +6,8 @@ import {NavigationEnd, Router} from '@angular/router';
 import {F_COMPTET} from '../../models/JSON/F_COMPTET';
 import {Storage} from "@ionic/storage";
 import { Keyboard } from '@ionic-native/keyboard/ngx';
+import { NgZone  } from '@angular/core';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 @Component({
     selector: 'app-login',
@@ -26,9 +28,12 @@ export class LoginPage implements OnInit{
                 private router: Router,
                 private platForm: Platform,
                 private storage: Storage,
-                private keyboard : Keyboard) {
+                private ngZone : NgZone,
+                private statusBar : StatusBar) {
 
         this.platForm.ready().then(() => {
+            this.statusBar.show();
+            this.statusBar.styleLightContent();
             // Je vérifie que le storage n'est pas vide une fois le storage prêt
             this.storage.ready().then(async () => {
                 this.userService.initActiveUserFromStorage().then(() =>{
@@ -54,15 +59,23 @@ export class LoginPage implements OnInit{
     }
 
     ngOnInit(): void {
-        //this.storage.clear();
-        window.addEventListener('keyboardWillShow', (event) => {
-            console.log("passage a false");
-            this.showLogo = false;
+        // this.storage.clear();
+
+        // Méthodes permettant de cacher/montrer le logo a l'ouverture du clavier
+        window.addEventListener('keyboardDidShow', (event) => {
+            // Utilisation de ngZone pour forcer le refresh de la page
+            // Sans ce refresh, rien ne se passe tant qu'un refresh (via une action) n'a pas été faite
+            this.ngZone.run(() => {
+                console.log("passage a false");
+                this.showLogo = false;
+            });
         });
 
-        window.addEventListener('keyboardWillHide', (event) => {
-            console.log("passage a true");
-            this.showLogo = true;
+        window.addEventListener('keyboardDidHide', (event) => {
+            this.ngZone.run(() => {
+                console.log("passage a true");
+                this.showLogo = true;
+            });
         });
     }
 
