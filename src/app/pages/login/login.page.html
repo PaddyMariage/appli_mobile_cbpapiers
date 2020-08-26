@@ -18,7 +18,11 @@
     </div>
   </form>
   <div class="red"> {{error}} </div>
-  <a (click)= "createContact()">Identifiants oublié?</a>
-  <ion-button expand="block" color="success" class="bouton" (click)="addCustomerAndGoToArticle()">Login client sans info</ion-button>
-  <ion-button expand="block" color="warning" class="bouton" (click)="goToAdministration()">Login admin sans info</ion-button>
+  <div class="ion-text-center">
+    <a (click)= "createContact()">Identifiants oublié?</a>
+  </div>
+  <!-- 
+    <ion-button expand="block" color="success" class="bouton" (click)="addCustomerAndGoToArticle()">Login client sans info</ion-button>
+    <ion-button expand="block" color="warning" class="bouton" (click)="goToAdministration()">Login admin sans info</ion-button>
+  -->
 </ion-content>
