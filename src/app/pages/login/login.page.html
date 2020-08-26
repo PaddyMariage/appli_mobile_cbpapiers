@@ -1,4 +1,6 @@
-<img class="space" src="assets/icon/logo.png" alt="logo">
+<span *ngIf="showLogo">
+  <img src="assets/icon/logo.png" alt="logo">
+</span>
 <ion-content>
   <form onsubmit={this.processForm}>
     <ion-list>

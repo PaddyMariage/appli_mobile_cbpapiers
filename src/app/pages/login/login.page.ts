@@ -5,6 +5,7 @@ import {UserService} from 'src/app/services/user.service';
 import {NavigationEnd, Router} from '@angular/router';
 import {F_COMPTET} from '../../models/JSON/F_COMPTET';
 import {Storage} from "@ionic/storage";
+import { Keyboard } from '@ionic-native/keyboard/ngx';
 
 @Component({
     selector: 'app-login',
@@ -17,13 +18,15 @@ export class LoginPage implements OnInit{
     password: string;
     error: string;
     storageSize: number;
+    showLogo : boolean = true;
 
     constructor(private navCtrl: NavController,
                 private modalController: ModalController,
                 private userService: UserService,
                 private router: Router,
                 private platForm: Platform,
-                private storage: Storage) {
+                private storage: Storage,
+                private keyboard : Keyboard) {
 
         this.platForm.ready().then(() => {
             // Je vérifie que le storage n'est pas vide une fois le storage prêt
@@ -55,6 +58,15 @@ export class LoginPage implements OnInit{
 
     ngOnInit(): void {
         //this.storage.clear();
+        window.addEventListener('keyboardWillShow', (event) => {
+            console.log("passage a false");
+            this.showLogo = false;
+        });
+
+        window.addEventListener('keyboardWillHide', (event) => {
+            console.log("passage a true");
+            this.showLogo = true;
+        });
     }
 
 

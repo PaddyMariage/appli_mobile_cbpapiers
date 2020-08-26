@@ -18,6 +18,7 @@ import {FileOpener} from '@ionic-native/file-opener/ngx';
 import {EmailComposer} from '@ionic-native/email-composer/ngx';
 import {UserService} from "./services/user.service";
 import {HTTP} from "@ionic-native/http/ngx";
+import { Keyboard } from '@ionic-native/keyboard/ngx';
 
 @NgModule({
     declarations: [AppComponent],
@@ -27,7 +28,7 @@ import {HTTP} from "@ionic-native/http/ngx";
         SplashScreen,
         UserService,
         {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
-        File, FileOpener, EmailComposer, HTTP
+        File, FileOpener, EmailComposer, HTTP, Keyboard
     ],
     bootstrap: [AppComponent]
 })
