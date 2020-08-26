@@ -65,34 +65,30 @@ export class UserService {
         return this.customerAccounts;
     }
 
-    getAllF_COMPTETs() {
-        return this.http.get<F_COMPTET[]>('assets/F_COMPTET.json');
-    }
-
     async getUserValidity(login: string, password: string) {
         return new Promise((resolve, reject) => {
-                this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
-                    .then(F_COMPTET => {
-                        const data: F_COMPTET = JSON.parse(F_COMPTET.data);
-                        console.log(data);
-                        // je verifie si le ct num est bon puis soit c'est un admin soit le password est bon
-                        if (data.CT_Num.toLowerCase() == login.toLowerCase() && data.MDP.toLowerCase() == password.toLowerCase()) {
-                            this.activeCustomer$.next(data);
-                            this.activeCustomer = data;
-                            resolve(data);
-                        } else
-                            reject('Mauvais identifiants');
-                    })
-                    .catch(error => {
-                        reject(error);
-                    });
+            this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
+                .then(F_COMPTET => {
+                    const data: F_COMPTET = JSON.parse(F_COMPTET.data);
+                    console.log(data);
+                    // je verifie si le ct num est bon puis soit c'est un admin soit le password est bon
+                    if (data.CT_Num.toLowerCase() == login.toLowerCase() && data.MDP.toLowerCase() == password.toLowerCase()) {
+                        this.activeCustomer$.next(data);
+                        this.activeCustomer = data;
+                        resolve(data);
+                    } else
+                        reject('Mauvais identifiants');
+                })
+                .catch(error => {
+                    reject(error);
+                });
         });
     }
 
     isAdmin() {
         let index = 0;
         let admin = false;
-        if(this.customerAccounts != null)
+        if (this.customerAccounts != null)
             while (!admin && index < this.customerAccounts.length) {
                 if (this.customerAccounts[index].CT_Num == 'CBPAP')
                     admin = true;

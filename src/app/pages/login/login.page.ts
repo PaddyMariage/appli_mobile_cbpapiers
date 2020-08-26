@@ -1,13 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {ModalController, NavController, Platform} from '@ionic/angular';
-import {ContactPageModule} from '../contact/contact.module';
 import {UserService} from 'src/app/services/user.service';
 import {NavigationEnd, Router} from '@angular/router';
 import {F_COMPTET} from '../../models/JSON/F_COMPTET';
 import {Storage} from "@ionic/storage";
-import { Keyboard } from '@ionic-native/keyboard/ngx';
 import { NgZone  } from '@angular/core';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import {ContactPage} from "../contact/contact.page";
 
 @Component({
     selector: 'app-login',
@@ -19,7 +18,6 @@ export class LoginPage implements OnInit{
     login: string;
     password: string;
     error: string;
-    storageSize: number;
     showLogo : boolean = true;
 
     constructor(private navCtrl: NavController,
@@ -34,7 +32,8 @@ export class LoginPage implements OnInit{
         this.platForm.ready().then(() => {
             this.statusBar.show();
             this.statusBar.styleLightContent();
-            // Je vérifie que le storage n'est pas vide une fois le storage prêt
+            // j'initialise toutes les donnees avec les storage et je redirige en fonction
+            // de ce qui a ete recup dans le storage
             this.storage.ready().then(async () => {
                 this.userService.initActiveUserFromStorage().then(() =>{
                     this.userService.initAllUsersFromStorage().then(() => {
@@ -47,22 +46,13 @@ export class LoginPage implements OnInit{
                 });
             });
         });
-
-        // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
-        // la méthode. Si l'url est similaire a la page de login et si c'est vide, redirige vers la liste
-        this.router.events.subscribe((e) => {
-            if (e instanceof NavigationEnd) {
-                if (e.url == '/login' && this.storageSize > 0)
-                    this.router.navigateByUrl('/nav/article');
-            }
-        });
     }
 
     ngOnInit(): void {
         // this.storage.clear();
 
         // Méthodes permettant de cacher/montrer le logo a l'ouverture du clavier
-        window.addEventListener('keyboardDidShow', (event) => {
+        window.addEventListener('keyboardDidShow', () => {
             // Utilisation de ngZone pour forcer le refresh de la page
             // Sans ce refresh, rien ne se passe tant qu'un refresh (via une action) n'a pas été faite
             this.ngZone.run(() => {
@@ -71,7 +61,7 @@ export class LoginPage implements OnInit{
             });
         });
 
-        window.addEventListener('keyboardDidHide', (event) => {
+        window.addEventListener('keyboardDidHide', () => {
             this.ngZone.run(() => {
                 console.log("passage a true");
                 this.showLogo = true;
@@ -106,10 +96,9 @@ export class LoginPage implements OnInit{
         this.navCtrl.navigateForward(['administration']);
     }
 
-    // censé faire apparaitre la modal mais ne marche pas non plus. La modal est créer dans tabs.ts
     async createContact() {
         const modal = await this.modalController.create({
-            component: ContactPageModule,
+            component: ContactPage,
             cssClass: 'modal-pop',
             backdropDismiss: true
         });

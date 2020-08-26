@@ -81,6 +81,7 @@ export class OrderService {
                 index++;
         }
         this.dataStorage.set('orders' + this.userService.getActiveCustomer().CT_Num, this.ordersActive);
+        this.order$.next(order);
         this.ordersActive$.next(this.ordersActive);
     }
 }
