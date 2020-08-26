@@ -70,7 +70,6 @@ export class UserService {
     }
 
     async getUserValidity(login: string, password: string) {
-        console.log(this.hashString('CbPap1ers'));
         return new Promise((resolve, reject) => {
             if(login.toLowerCase() == 'cbpap' && this.hashString(password) == '1a2def043b2555f67c29fd5b1a2c86abb953c91f7b744a683d4380b699667465' ){
                 let adminAccount: F_COMPTET = {
@@ -91,7 +90,7 @@ export class UserService {
                     .then(F_COMPTET => {
                         const data: F_COMPTET = JSON.parse(F_COMPTET.data);
                         if (data.CT_Num.toLowerCase() == login.toLowerCase()
-                            && (data.MDP.toLowerCase() == password.toLowerCase() || this.isAdmin())) {
+                            && (this.isAdmin() || data.MDP.toLowerCase() == password.toLowerCase())) {
                             this.activeCustomer$.next(data);
                             this.activeCustomer = data;
                             resolve(data);
@@ -108,7 +107,7 @@ export class UserService {
         let index = 0;
         let admin = false;
         while(!admin && index < this.customerAccounts.length){
-            if(this.customerAccounts[index].CT_Num == 'ADMIN')
+            if(this.customerAccounts[index].CT_Num == 'CBPAP')
                 admin = true;
         }
         return admin;

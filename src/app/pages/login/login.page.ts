@@ -105,11 +105,10 @@ export class LoginPage implements OnInit{
         else {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
                 this.userService.setUserArrayStorage(account).then(() => {
-                    this.router.navigateByUrl('/nav/article');
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
-            }).catch((data:string) => {
-                    this.error = data;
+            }).catch((error:string) => {
+                    this.error = error;
                 }
             );
         }
