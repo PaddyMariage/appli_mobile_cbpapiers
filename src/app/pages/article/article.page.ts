@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {ModalController} from '@ionic/angular';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {LoadingController, ModalController} from '@ionic/angular';
 import {SingleArticlePage} from '../single-article/single-article.page';
 import {OrderLine} from 'src/app/models/OrderLine';
 import {UserService} from 'src/app/services/user.service';
@@ -8,13 +8,14 @@ import {ArticleService} from '../../services/article.service';
 import {Order} from "../../models/Order";
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
 import {Storage} from "@ionic/storage";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'app-articles',
     templateUrl: './article.page.html',
     styleUrls: ['./article.page.scss'],
 })
-export class ArticlePage implements OnInit {
+export class ArticlePage implements OnInit, OnDestroy {
 
     possibleQuantities: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
     cart: Order;
@@ -22,168 +23,88 @@ export class ArticlePage implements OnInit {
     orderLineBackup: OrderLine[] = [];
     totalQuantity: number;
     customer: F_COMPTET;
+    loading: HTMLIonLoadingElement;
+    cartSub: Subscription;
+    orderLineSub: Subscription;
+    activeCustomerSub: Subscription;
 
     constructor(private modalController: ModalController,
                 private cartService: CartService,
                 private userService: UserService,
                 private articleService: ArticleService,
-                private storage : Storage) {
+                private storage: Storage,
+                private loadingController: LoadingController) {
     }
 
     ngOnInit(): void {
-        this.cartService.cart$.subscribe(data => {
+        this.cartSub = this.cartService.cart$.subscribe(data => {
             this.cart = data;
             this.totalQuantity = data.orderLines.length;
         });
 
-        this.cartService.orderLineList$.subscribe(
+        this.orderLineSub = this.cartService.orderLineList$.subscribe(
             (liste) => {
                 this.orderLineList = liste;
             }
         );
 
-        this.userService.activeCustomer$.subscribe(
+        this.activeCustomerSub = this.userService.activeCustomer$.subscribe(
             customer => {
                 // on ne refresh pas si c'est déjà celui présent dans la page
-                if(this.customer == null || this.customer.CT_Num != customer.CT_Num) {
+                if (this.customer == null || this.customer.CT_Num != customer.CT_Num) {
                     this.orderLineList = [];
                     this.customer = customer;
                     this.initTopF_ARTICLE();
                 }
             }
         );
+
+        this.presentLoading();
+    }
+
+    async presentLoading() {
+        this.loading = await this.loadingController.create({
+            spinner: 'lines',
+            message: 'Veuillez patienter le temps que je prépare votre liste de produits...',
+            translucent: true,
+        });
+        await this.loading.present();
+    }
+
+    dismissLoading() {
+        this.loadingController.dismiss(this);
     }
 
     private async initTopF_ARTICLE() {
-        console.log('in initTopF_ARTICLE()');
-        await this.userService.getDocLignes().then(
-            (orderLines: OrderLine[]) => this.orderLineList = orderLines)
+        await this.articleService.getDocLignes(this.customer.CT_Num).then(
+            (orderLines: OrderLine[]) => this.cartService.initOrderLinesList(orderLines)
+        )
             .catch(error => console.log(error))
             .finally(() => {
-                console.log(this.orderLineList)
+                console.log(this.orderLineList);
                 this.initAllInfos(this.orderLineList)
             });
-
-        // let articlesAndFrequency: [string, string, number][] = [];
-        // let AR_Ref_Array: string[] = [];
-        // const ctNum = this.customer.CT_Num;
-        // this.userService.getDocLignes().subscribe(
-        //     (F_DOCLIGNES) => {
-        //         F_DOCLIGNES.forEach(
-        //             (DOCLIGNE) => {
-        //                 if (DOCLIGNE.CT_Num == ctNum && DOCLIGNE.AR_Ref.trim() != '')
-        //
-        //                     if (AR_Ref_Array.indexOf(DOCLIGNE.AR_Ref.trim()) != -1)
-        //                         articlesAndFrequency[AR_Ref_Array.indexOf(DOCLIGNE.AR_Ref.trim())][2]++;
-        //
-        //                     else {
-        //                         AR_Ref_Array.push(DOCLIGNE.AR_Ref.trim());
-        //                         articlesAndFrequency.push([DOCLIGNE.AR_Ref.trim(), DOCLIGNE.DL_Design, 1]);
-        //                     }
-        //             }
-        //         );
-        //         articlesAndFrequency.sort((a, b) => (b[2] - a[2]));
-        //         articlesAndFrequency.forEach(
-        //             data => {
-        //                 const orderLine = {
-        //                     article: {
-        //                         reference: data[0],
-        //                         label: data[1],
-        //                         AC_PrixVen: 0,
-        //                         AC_Remise: 0
-        //                     },
-        //                     quantity: 0,
-        //                     orderNumber: null,
-        //                 };
-        //                 this.orderLineList.push(orderLine);
-        //             }
-        //         )
-        //     },
-        //     (error) => console.error(error),
-        //     () => {
-        //         this.initAllInfosTest();
-        //     }
-        // );
     }
 
     private async initAllInfos(orderLineList: OrderLine[]) {
-        console.log('in initAllInfos()')
-        await this.articleService.getF_ARTCLIENT(orderLineList).then(
-            (orderLineListUpdated: OrderLine[]) => this.orderLineList = orderLineListUpdated
+        console.log('in initAllInfos()');
+        await this.articleService.getArtClients(orderLineList, this.customer.CT_Num).then(
+            (orderLineList_Updated: OrderLine[]) => this.orderLineList = orderLineList_Updated
         ).finally(() => {
-            console.log(this.articleService);
             this.initAllPrices(this.orderLineList);
         });
 
-        //
-        // this.articleService.getF_ARTCLIENT().subscribe(
-        //     (F_ARTCLIENT) => {
-        //         for (let orderLine of this.orderLineList)
-        //
-        //                     for (const discount of F_ARTCLIENT)
-        //
-        //                         if (discount.CT_Num == ctNum && discount.AR_Ref == orderLine.article.reference) {
-        //
-        //                     const AC_PrixVen = parseFloat(discount.AC_PrixVen.replace(',', '.'));
-        //                     const AC_Remise = parseFloat(discount.AC_Remise.replace(',', '.'));
-        //                     if (AC_PrixVen != 0 && AC_Remise != 0) {
-        //                         orderLine.article.AC_PrixVen = AC_PrixVen;
-        //                         orderLine.article.AC_Remise = AC_Remise;
-        //
-        //                     } else if (AC_PrixVen != 0 && AC_Remise == 0)
-        //                         orderLine.article.AC_PrixVen = AC_PrixVen;
-        //
-        //                     else if (AC_PrixVen == 0 && AC_Remise != 0)
-        //                         orderLine.article.AC_Remise = AC_Remise;
-        //
-        //                 }
-        //     },
-        //     error => console.error(error),
-        //     () => this.initAllPricesTest()
-        // );
     }
 
     private async initAllPrices(orderLineList: OrderLine[]) {
-        console.log('in initAllPrices()')
+        console.log('in initAllPrices()');
         await this.articleService.getF_ARTICLE(orderLineList).then(
             (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
-        ).finally(() => console.log(this.orderLineList));
-
-
-
-        // this.articleService.getF_ARTICLE().subscribe(
-            // (F_ARTICLES) => {
-            //     for (const orderline of this.orderLineList)
-            //
-            //         for (const article of F_ARTICLES)
-            //
-            //             if (orderline.article.reference == article.AR_Ref.trim())
-            //
-            //                 if (orderline.article.AC_PrixVen != 0 && orderline.article.AC_Remise != 0)
-            //                     orderline.article.unitPrice =
-            //                         orderline.article.AC_PrixVen * (1 - orderline.article.AC_Remise / 100);
-            //
-            //                 else if (orderline.article.AC_PrixVen != 0 && orderline.article.AC_Remise == 0)
-            //                     orderline.article.unitPrice =
-            //                         orderline.article.AC_PrixVen;
-            //
-            //                 else if (orderline.article.AC_PrixVen == 0 && orderline.article.AC_Remise != 0)
-            //                     orderline.article.unitPrice =
-            //                         parseFloat(article.AR_PrixVen.replace(',', '.'))
-            //                         * (1 - orderline.article.AC_Remise / 100);
-            //
-            //                 else
-            //                     orderline.article.unitPrice =
-            //                         parseFloat(article.AR_PrixVen.replace(',', '.'));
-            //
-            //
-            // },
-        //     error => console.error(error),
-        //     () => {
-        //         this.cartService.initOrderLinesList(this.orderLineList);
-        //         this.orderLineBackup = this.orderLineList;
-        //     }
-        // );
+        ).finally(() => {
+            console.log(this.orderLineList);
+            this.cartService.initOrderLinesList(this.orderLineList);
+            this.dismissLoading();
+        });
     }
 
 
@@ -258,6 +179,12 @@ export class ArticlePage implements OnInit {
 
         // on met à jour le nouveau panier dans le service
         this.cartService.setCart(this.cart);
+    }
+
+    ngOnDestroy() {
+        this.cartSub.unsubscribe();
+        this.orderLineSub.unsubscribe();
+        this.activeCustomerSub.unsubscribe();
     }
 }
 

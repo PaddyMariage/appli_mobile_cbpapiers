@@ -78,7 +78,7 @@ export class OrderValidationPage implements OnInit {
     constructBody() {
         for (const orderline of this.order.orderLines) {
             // @ts-ignore
-            this.myBody.push([`${orderline.article.reference}`, `${orderline.quantity}`, `${Number(orderline.article.unitPrice * orderline.quantity).toFixed(2) + '€'}`]);
+            this.myBody.push([orderline.article.reference, orderline.quantity, Number(orderline.article.unitPrice * orderline.quantity).toFixed(2) + '€']);
         }
         return this.myBody;
     }
@@ -110,8 +110,7 @@ export class OrderValidationPage implements OnInit {
                 // impression de la date au format dd/mm/yyyy hh'h'mm
                 {
                     // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
-                    //text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
-                    text : new Date() + ' ',
+                    text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
                     alignment: 'right'
                 },
                 {text: 'Commande : ', style: 'subheader'},
@@ -174,18 +173,15 @@ export class OrderValidationPage implements OnInit {
                 {text: 'CBPAPIERS', style: 'header'},
                 // impression de la date au format dd/mm/yyyy hh'h'mm
                 {
-                    // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
-                    // text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
-                    text : new Date() + ' ',
+                    text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
                     alignment: 'right'
                 },
                 // tslint:disable-next-line:max-line-length
 
                 // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
-                /* {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' ' + this.cartService.getCart().orderDate.toLocaleDateString() +
-                       ' ' + this.cartService.getCart().orderDate.toLocaleTimeString() + ' MODIFIEE' , style: 'subheader'},*/
-                {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' ' +
-                ' ' + this.cartService.getCart().orderDate + ' MODIFIEE' , style: 'subheader'},     
+                 {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' '
+                         + new Date(this.cartService.getCart().orderDate).toLocaleDateString() +
+                       ' ' + new Date(this.cartService.getCart().orderDate).toLocaleTimeString() + ' MODIFIEE' , style: 'subheader'},
                 {text: 'Ref client : ' + this.userService.getActiveCustomer().CT_Num},
                 {text: this.userService.getActiveCustomer().CT_Intitule},
                 {text: this.userService.getActiveCustomer().CT_Adresse},

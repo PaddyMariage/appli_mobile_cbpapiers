@@ -12,9 +12,6 @@ import {Storage} from "@ionic/storage";
     styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit{
-    ngOnInit(): void {
-        this.storage.clear();
-    }
 
     login: string;
     password: string;
@@ -41,7 +38,7 @@ export class LoginPage implements OnInit{
                     });
                 });
             });
-        })
+        });
 
 
         // on subscribe a l'evenement lié au routeur, a chaque changement d'url, on lance
@@ -52,6 +49,10 @@ export class LoginPage implements OnInit{
                     this.router.navigateByUrl('/nav/article');
             }
         });
+    }
+
+    ngOnInit(): void {
+        // this.storage.clear();
     }
 
 
@@ -104,6 +105,7 @@ export class LoginPage implements OnInit{
         else {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
                 this.userService.setUserArrayStorage(account).then(() => {
+                    this.router.navigateByUrl('/nav/article');
                     this.navCtrl.navigateForward(['/nav/article']);
                 });
             }).catch((data:string) => {
