@@ -35,11 +35,16 @@ export class DeleteAccPage implements OnInit {
             this.error = 'Veuillez entrer un mot de passe';
         } else {
             await this.userService.getUserValidity(this.login, this.password).then((account: F_COMPTET) => {
-                this.userService.setUserArrayStorage(account).then(() => {
-                    this.navCtrl.navigateForward(['/nav/article']);
-                });
-            }).catch((error: string) => {
-                    this.error = error;
+                // je delete du storage & du service
+                this.userService.removeUserArrayStorage(account);
+
+                // je redirige en fonction du nombre d'utilisateurs restant
+                if (this.userService.getCustomerAccounts().length == 0)
+                    this.navCtrl.navigateRoot(['/login']);
+                else
+                    this.navCtrl.navigateBack(['/acc-choice']);
+            }).catch((data) => {
+                    this.error = data;
                 }
             );
         }
