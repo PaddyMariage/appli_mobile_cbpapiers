@@ -203,6 +203,7 @@ export class ArticlePage implements OnInit, OnDestroy {
         this.articleService.getF_ARTICLE(orderLineList)
             .then((orderLineList_Final: OrderLine[]) => {
                 this.orderLineList = orderLineList_Final;
+                this.orderLineBackup = this.orderLineList;
                 this.error = '';
                 this.errorBol = false;
                 this.dismissLoading();
