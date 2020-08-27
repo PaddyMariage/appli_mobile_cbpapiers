@@ -14,9 +14,8 @@ import {UserService} from '../../services/user.service';
 import {OrderLine} from '../../models/OrderLine';
 import {OrderService} from '../../services/order.service';
 import {Order} from '../../models/Order';
-import { cloneDeep } from 'lodash';
+import {cloneDeep} from 'lodash';
 import {GenerateIDService} from '../../services/generate-id.service';
-import {Storage} from "@ionic/storage";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -31,6 +30,15 @@ export class OrderValidationPage implements OnInit {
     pdfObj = null;
     order: Order;
     statusShipping: boolean;
+    orderNumberWasNull: boolean;
+    // construction du header du tableau du pdf = titres des colonnes du tableau
+    header = [
+        {text: 'Reference article', style: 'tableHeader', alignment: 'center'},
+        {text: 'Quantité', style: 'tableHeader', alignment: 'center'},
+        {text: 'Prix', style: 'tableHeader', alignment: 'center'}
+    ];
+    // on initialise les lignes du tableau avec le header
+    myBody = [this.header];
 
     constructor(private plt: Platform,
                 private file: File,
@@ -41,8 +49,7 @@ export class OrderValidationPage implements OnInit {
                 private userService: UserService,
                 private orderService: OrderService,
                 private modalController: ModalController,
-                private generateIdService: GenerateIDService,
-                private storage : Storage) {
+                private generateIdService: GenerateIDService) {
     }
 
     ngOnInit() {
@@ -50,7 +57,6 @@ export class OrderValidationPage implements OnInit {
         this.finalTotal = this.cartService.getFinalTotal();
         this.statusShipping = this.warehouseRetService.getStatusShipping();
     }
-
 
     // permet d'indiquer si y a un retrait entrepôt ou non en fonction du statut du toogle du retrait entrepôt
     isWarehouseRet() {
@@ -61,19 +67,10 @@ export class OrderValidationPage implements OnInit {
         return this.statusShipping ? '20 €' : 'gratuite';
     }
 
-    // construction du header du tableau du pdf = titres des colonnes du tableau
-    header = [
-        {text: 'Reference article', style: 'tableHeader', alignment: 'center'},
-        {text: 'Quantité', style: 'tableHeader', alignment: 'center'},
-        {text: 'Prix', style: 'tableHeader', alignment: 'center'}
-    ];
-
-    // on initialise les lignes du tableau avec le header
-    myBody = [this.header];
-
     // construction des lignes du tableau : pour chaque orderline récupérée du panier
     // on ajoute cette orderline dans une ligne du tableau avec les éléments dont on a besoin :
     // ici reference de l'article, quantité et prix final
+
     // l'array myBody est donc incrémenté de nouvelles données
     constructBody() {
         for (const orderline of this.order.orderLines) {
@@ -83,128 +80,68 @@ export class OrderValidationPage implements OnInit {
         return this.myBody;
     }
 
-    checkEditOrderOrNot(){
-        if (this.order.orderNumber == null){
-            console.log("Commande non présente");
-            this.order =
-                {
-                    // numéro de commande généré dans le service generateID
-                    orderNumber: this.generateIdService.generate(),
-                    orderDate: new Date(),
-                    customer : this.userService.getActiveCustomer(),
-                    orderLines: this.cartService.getCart().orderLines,
-                };
-            this.sendPdf();
-        } else {
-            console.log("Commande déjà présente");
-            this.order = this.cartService.getCart();
-            this.sendPdfEdit();
-        }
-    }
-
     sendPdf() {
-        // enregistrement de la commande réalisée dans le tableau des commandes de orderService
-        let docDefinition = {
-            content: [
-                {text: 'CBPAPIERS', style: 'header'},
-                // impression de la date au format dd/mm/yyyy hh'h'mm
-                {
-                    // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
-                    text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
-                    alignment: 'right'
-                },
-                {text: 'Commande : ', style: 'subheader'},
+        const docDefinitionPart1 = [
+            {text: 'CBPAPIERS', style: 'header'},
+            // impression de la date au format dd/mm/yyyy hh'h'mm
+            {
+                text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                alignment: 'right'
+            }
+        ];
+
+        let docDefinitionPart2;
+        if (this.order.orderNumber == null) {
+            this.orderNumberWasNull = true;
+            this.order.orderNumber = this.generateIdService.generate();
+            this.order.orderDate = new Date();
+
+            docDefinitionPart2 = [
+                {text: 'Commande n° : ' + this.order.orderNumber, style: 'subheader'},
                 {text: 'Ref client : ' + this.userService.getActiveCustomer().CT_Num},
                 {text: this.userService.getActiveCustomer().CT_Intitule},
                 {text: this.userService.getActiveCustomer().CT_Adresse},
                 {text: this.userService.getActiveCustomer().CT_CodePostal + ' ' + this.userService.getActiveCustomer().CT_Ville},
+                {text: this.userService.getActiveCustomer().CT_Pays}
+            ];
 
-                // c'est ici qu'on construit le tableau dans le pdf :
-                // on indique le nombre de colonnes et on injecte l'array myBody construit dans la méthode constructBody()
+        } else {
+            docDefinitionPart2 = [
                 {
-                    style: 'tableExample',
-                    table: {
-                        widths: ['*', '*', '*'],
-                        body: this.constructBody()
-                    }
+                    text: 'ATTENTION Commande n° ' + this.cartService.getCart().orderNumber
+                        + ' du ' + new Date(this.cartService.getCart().orderDate).toLocaleDateString() +
+                        ' ' + new Date(this.cartService.getCart().orderDate).toLocaleTimeString()
+                        + ' MODIFIEE', style: 'subheader'
                 },
-                {text: 'Livraison : ' + this.shipping(), alignment: 'right'},
-                {
-                    text: 'Total HT : ' + Number(this.finalTotal).toFixed(2) + ' €', alignment: 'right'
-                },
-                {
-                    text: 'Retrait entrepôt : ' + this.isWarehouseRet(), alignment: 'right'
-                }
-            ],
-            styles: {
-                subheader: {
-                    fontSize: 16,
-                    bold: true,
-                    margin: [0, 10, 0, 5]
-                },
-                tableExample: {
-                    margin: [0, 5, 0, 15]
-                },
-                tableHeader: {
-                    bold: true,
-                    fontSize: 13,
-                    color: 'black'
-                }
-            },
-            defaultStyle: {
-                alignment: 'justify'
-            }
-        };
-        this.pdfObj = pdfMake.createPdf(docDefinition);
-        this.downloadPdf();
-        this.sendMail();
-
-        const ORDER_HISTORY = cloneDeep(this.order);
-        this.orderService.addOrder(ORDER_HISTORY);
-
-        // on reinitialise les orderlines de panier pour le remettre à 0
-        this.deleteAll(this.order.orderLines);
-    }
-
-    sendPdfEdit() {
-        // enregistrement de la commande réalisée dans le tableau des commandes de orderService
-        const docDefinition = {
-            content: [
-                {text: 'CBPAPIERS', style: 'header'},
-                // impression de la date au format dd/mm/yyyy hh'h'mm
-                {
-                    text: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
-                    alignment: 'right'
-                },
-                // tslint:disable-next-line:max-line-length
-
-                // CODE COMMENTE ICI ET REMPLACER POUR LES TESTS. A REMETTRE UNE FOIS LE SOUCIS REGLER
-                 {text: 'ATTENTION Commande ' + this.cartService.getCart().orderNumber + ' '
-                         + new Date(this.cartService.getCart().orderDate).toLocaleDateString() +
-                       ' ' + new Date(this.cartService.getCart().orderDate).toLocaleTimeString() + ' MODIFIEE' , style: 'subheader'},
                 {text: 'Ref client : ' + this.userService.getActiveCustomer().CT_Num},
                 {text: this.userService.getActiveCustomer().CT_Intitule},
                 {text: this.userService.getActiveCustomer().CT_Adresse},
-                {text: this.userService.getActiveCustomer().CT_CodePostal + ' ' +
-                        this.userService.getActiveCustomer().CT_Ville},
+                {text: this.userService.getActiveCustomer().CT_CodePostal + ' ' + this.userService.getActiveCustomer().CT_Ville},
+                {text: this.userService.getActiveCustomer().CT_Pays}
+            ];
+        }
 
-                // c'est ici qu'on construit le tableau dans le pdf :
-                // on indique le nombre de colonnes et on injecte l'array myBody construit dans la méthode constructBody()
-                {
-                    style: 'tableExample',
-                    table: {
-                        widths: ['*', '*', '*'],
-                        body: this.constructBody()
-                    }
-                },
-                {text : 'Livraison : ' + this.shipping(), alignment: 'right'},
-                {
-                    text: 'Total HT : ' + Number(this.finalTotal).toFixed(2) + ' €', alignment: 'right'
-                },
-                {
-                    text: 'Retrait entrepôt : ' + this.isWarehouseRet(), alignment: 'right'
+        // c'est ici qu'on construit le tableau dans le pdf :
+        // on indique le nombre de colonnes et on injecte l'array myBody construit dans la méthode constructBody()
+        const docDefinitionPart3 = [
+            {
+                style: 'tableExample',
+                table: {
+                    widths: ['*', '*', '*'],
+                    body: this.constructBody()
                 }
-            ],
+            },
+            {text: 'Livraison : ' + this.shipping(), alignment: 'right'},
+            {
+                text: 'Total HT : ' + Number(this.finalTotal).toFixed(2) + ' €', alignment: 'right'
+            },
+            {
+                text: 'Retrait entrepôt : ' + this.isWarehouseRet(), alignment: 'right'
+            }
+        ];
+
+        const docDefinition = {
+            content: [docDefinitionPart1, docDefinitionPart2, docDefinitionPart3],
             styles: {
                 subheader: {
                     fontSize: 16,
@@ -224,17 +161,15 @@ export class OrderValidationPage implements OnInit {
                 alignment: 'justify'
             }
         };
-
         this.pdfObj = pdfMake.createPdf(docDefinition);
         this.downloadPdf();
         this.sendMail();
-
-        // on fait un clone de la commande
-        // on envoie ce clone pour modification de la commande déjà existante avec le même numéro de commande
         const ORDER_HISTORY = cloneDeep(this.order);
-        this.orderService.editOrderStorage(ORDER_HISTORY);
-        // this.orderService.editOrder(ORDER_HISTORY);
 
+        if (this.orderNumberWasNull)
+            this.orderService.addOrder(ORDER_HISTORY);
+        else
+            this.orderService.editOrderStorage(ORDER_HISTORY);
 
         // on reinitialise les orderlines de panier pour le remettre à 0
         this.deleteAll(this.order.orderLines);
@@ -250,10 +185,7 @@ export class OrderValidationPage implements OnInit {
                 let blob = new Blob([buffer], {type: 'application/pdf'});
 
                 // Save the PDF to the data Directory of our App
-                this.file.writeFile(this.file.dataDirectory, 'commande.pdf', blob, {replace: true}).then(fileEntry => {
-                    //  à enlever !  je laisse juste pour les tests sur pc
-                    // this.fileOpener.open(this.file.dataDirectory + 'myletter.pdf', 'application/pdf');
-                });
+                this.file.writeFile(this.file.dataDirectory, 'commande.pdf', blob, {replace: true});
             });
         } else {
             // On a browser simply use download!
@@ -264,17 +196,28 @@ export class OrderValidationPage implements OnInit {
 
     // permet de formater le mail à envoyer et demande à ouvrir le mail sur le telephone + ajoute le pdf en pièce jointe
     sendMail() {
-        const email = {
-            // to: 'contact@cbpapiers.com',
-            to: 'adrien.fek@gmail.com',
-            cc: 'justine.gracia@gmail.com',
-            attachments: [
-                this.file.dataDirectory + 'commande.pdf'
-            ],
-            subject: ' REFCLIENT : ' + this.userService.getActiveCustomer().CT_Num,
-            body: 'Ci-joint le récapitulatif de la commande',
-            isHtml: true
-        };
+        let email;
+        if (this.orderNumberWasNull) {
+            email = {
+                to: 'commandemobile@cbpapiers.com',
+                attachments: [
+                    this.file.dataDirectory + 'commande.pdf'
+                ],
+                subject: 'Nouvelle commande n° ' + this.order.orderNumber + ' | REFCLIENT : ' + this.userService.getActiveCustomer().CT_Num,
+                body: 'Ci-joint le récapitulatif de la commande',
+                isHtml: true
+            };
+        } else {
+            email = {
+                to: 'commandemobile@cbpapiers.com',
+                attachments: [
+                    this.file.dataDirectory + 'commande.pdf'
+                ],
+                subject: 'Modification commande n° ' + this.order.orderNumber + ' | REFCLIENT : ' + this.userService.getActiveCustomer().CT_Num,
+                body: 'Ci-joint le récapitulatif de la commande modifiée',
+                isHtml: true
+            };
+        }
         this.emailComposer.open(email);
 
     }
@@ -295,7 +238,6 @@ export class OrderValidationPage implements OnInit {
         this.cartService.resetCart();
         this.warehouseRetService.setStatus(false);
         this.onDismiss();
-        console.log("Delete effectué");
     }
 
 }

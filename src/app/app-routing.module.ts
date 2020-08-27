@@ -17,11 +17,6 @@ const routes: Routes = [
         canActivate: [AuthGuard]
     },
     {
-        path: 'administration',
-        loadChildren: () => import('./pages/administration/administration.module').then(m => m.AdministrationPageModule),
-        canActivate: [AuthGuard]
-    },
-    {
         path: '',
         redirectTo: 'login',
         pathMatch: 'full'

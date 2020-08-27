@@ -2,8 +2,6 @@ import {Injectable} from '@angular/core';
 import {OrderLine} from '../models/OrderLine';
 import {BehaviorSubject} from 'rxjs';
 import {WarehouseRetService} from './warehouse-ret.service';
-import {HttpClient} from "@angular/common/http";
-import {F_DOCLIGNE} from "../models/JSON/F_DOCLIGNE";
 import {Order} from '../models/Order';
 
 @Injectable({
@@ -11,21 +9,18 @@ import {Order} from '../models/Order';
 })
 export class CartService {
 
+    public cart$: BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
+    public orderLineList$: BehaviorSubject<OrderLine[]> = new BehaviorSubject<OrderLine[]>([]); // liste qui apparait sur la page article
     private cart: Order;
     private readonly initCart: Order;
-    public cart$: BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
-
     private orderLine: OrderLine;
-
     private orderLineList: OrderLine[] = [];
-    public orderLineList$: BehaviorSubject<OrderLine[]> = new BehaviorSubject<OrderLine[]>([]); // liste qui apparait sur la page article
-
     private WHRetrieval: boolean;
     private finalTotal: number;
     private total: number;
 
     // transfère le montant total du cart (utilisé dans la modal ValidationCom)
-    constructor(private warehouseRet: WarehouseRetService, private http: HttpClient) {
+    constructor(private warehouseRet: WarehouseRetService) {
 
         this.initCart = {
             orderNumber: null,
@@ -68,7 +63,7 @@ export class CartService {
 
 
     // permet d'initialiser la liste d'articles dans articlePage
-    initOrderLinesList(orderLines: OrderLine[]){
+    initOrderLinesList(orderLines: OrderLine[]) {
         this.orderLineList = orderLines;
         this.orderLineList$.next(orderLines);
     }
@@ -109,8 +104,11 @@ export class CartService {
         this.orderLineList$.next(this.orderLineList);
     }
 
+    filterOrderLineList(orderLinesFiltered: OrderLine[]) {
+        this.orderLineList$.next(orderLinesFiltered);
+    }
     // remise à 0 des quantités dans la liste d'article
-    resetQuantityOfOrderLineList(){
+    resetQuantityOfOrderLineList() {
         this.orderLineList.forEach(orderLine => orderLine.quantity = 0);
         this.orderLineList$.next(this.orderLineList);
     }
@@ -127,16 +125,6 @@ export class CartService {
         return this.orderLine;
     }
 
-    private updateTotal() {
-        // Si le toggle est activé on applique la WHRetrieval
-        this.total = 0;
-        if (!this.WHRetrieval) {
-            this.cart.orderLines.forEach(value => this.total += (value.article.unitPrice * value.quantity));
-        } else {
-            this.cart.orderLines.forEach(value => this.total += ((value.article.unitPrice * value.quantity) * 0.95));
-        }
-    }
-
     setTotal(total: number) {
         this.total = total;
     }
@@ -151,5 +139,15 @@ export class CartService {
 
     getFinalTotal() {
         return this.finalTotal;
+    }
+
+    private updateTotal() {
+        // Si le toggle est activé on applique la WHRetrieval
+        this.total = 0;
+        if (!this.WHRetrieval) {
+            this.cart.orderLines.forEach(value => this.total += (value.article.unitPrice * value.quantity));
+        } else {
+            this.cart.orderLines.forEach(value => this.total += ((value.article.unitPrice * value.quantity) * 0.95));
+        }
     }
 }

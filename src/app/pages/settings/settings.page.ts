@@ -1,7 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {NavController, AlertController} from '@ionic/angular';
-
-import {Customer} from 'src/app/models/Customer';
+import {AlertController, NavController} from '@ionic/angular';
 import {UserService} from 'src/app/services/user.service';
 import {F_COMPTET} from '../../models/JSON/F_COMPTET';
 
@@ -12,7 +10,7 @@ import {F_COMPTET} from '../../models/JSON/F_COMPTET';
 })
 export class SettingsPage implements OnInit {
 
-    customer : F_COMPTET;
+    customer: F_COMPTET;
 
     constructor(private navCtrl: NavController,
                 private alertCtrl: AlertController,
@@ -24,7 +22,7 @@ export class SettingsPage implements OnInit {
     }
 
     // Avance vers la page suppression de manière directe, comme une redirection
-    async goToDeleteAccount() {
+    goToDeleteAccount() {
         // on met le compte a supprimer dans le service pour le recuperer dans delete-acc
         this.userService.setCustomer(this.customer);
         this.navCtrl.navigateForward(['/acc-choice/settings/delete-acc']);

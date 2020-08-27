@@ -1,34 +1,34 @@
 import {NgModule} from '@angular/core';
-import {Routes, RouterModule} from '@angular/router';
+import {RouterModule, Routes} from '@angular/router';
 import {TabsPage} from "./tabs.page";
 import {AuthGuard} from "../../security/auth-guard.guard";
 
 const routes: Routes = [
     {
-        path:'',
-        component:TabsPage,
-        children:[
+        path: '',
+        component: TabsPage,
+        children: [
             {
-                path:'article',
+                path: 'article',
                 loadChildren: () => import('../article/article.module').then(m => m.ArticlesPageModule),
-                canActivate:[AuthGuard]
+                canActivate: [AuthGuard]
             },
             {
-                path:'history',
+                path: 'history',
                 loadChildren: () => import('../history/history.module').then(m => m.HistoryPageModule),
-                canActivate:[AuthGuard]
+                canActivate: [AuthGuard]
             },
             {
-                path:'',
-                redirectTo:'/nav/article',
-                pathMatch:'full'
+                path: '',
+                redirectTo: '/nav/article',
+                pathMatch: 'full'
             }
         ],
     },
     {
-        path:'',
-        redirectTo:'/nav/article',
-        pathMatch:'full'
+        path: '',
+        redirectTo: '/nav/article',
+        pathMatch: 'full'
     }
 ];
 

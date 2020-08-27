@@ -1,17 +1,21 @@
 
 .searchbar {
-    --placeholder-opacity : 40%;
+  --placeholder-opacity: 40%;
 }
 
-.small{
-    font-size: small;
+.small {
+  font-size: small;
 }
 
 button {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 span {
-    //background-color: blue;
-    margin: 1px;
+  //background-color: blue;
+  margin: 1px;
+}
+
+.red {
+  color: red;
 }

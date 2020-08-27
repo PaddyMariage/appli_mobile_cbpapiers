@@ -6,8 +6,8 @@ export class F_COMPTET {
     CT_CodePostal: string;
     CT_Ville: string;
     CT_Pays: string;
-    CT_Sommeil: number;
     CT_Telephone: string;
     CT_EMail: string;
+    CT_Sommeil: number;
     MDP?:string;
 }

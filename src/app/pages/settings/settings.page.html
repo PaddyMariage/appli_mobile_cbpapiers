@@ -1,22 +1,24 @@
 <ion-header>
-        <ion-toolbar>
-          <ion-row>
-              <ion-col size="2">
-                <ion-back-button color="success"></ion-back-button>
-              </ion-col>
+    <ion-toolbar>
+        <ion-row>
+            <ion-col size="2">
+                <ion-button class="backbutton" color="success">
+                    <ion-back-button class="backbutton"></ion-back-button>
+                </ion-button>
+            </ion-col>
             <ion-col size="2.5"></ion-col>
             <ion-col size="auto">
-              <img src="assets/icon/logo.jpg" class="header" alt="logo">
+                <img alt="logo" class="header" src="assets/icon/logo.jpg">
             </ion-col>
-          </ion-row>
-        </ion-toolbar>
-</ion-header> 
+        </ion-row>
+    </ion-toolbar>
+</ion-header>
 
 <ion-content>
     <ion-title>Selection du compte</ion-title>
     <ion-grid>
-        <ion-row align-items-center justify-content-center>
-            <ion-col align-self-center [size]="12" >
+        <ion-row>
+            <ion-col [size]="12">
                 <div>
                     <!--
                     <ion-avatar>
@@ -36,9 +38,10 @@
         </ion-row>
         <ion-row>
             <ion-col>
-                <ion-button color="danger" (click)="alertConfirm()">
+                <ion-button (click)="alertConfirm()" color="danger">
                     Supprimer le compte de l'appareil
                 </ion-button>
             </ion-col>
         </ion-row>
     </ion-grid>
+</ion-content>

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ModalController, AnimationController} from '@ionic/angular';
+import {AnimationController, ModalController} from '@ionic/angular';
 import {CallNumber} from '@ionic-native/call-number/ngx';
 
 @Component({
@@ -43,12 +43,12 @@ export class ContactPage implements OnInit {
                 .duration(400)
                 .beforeAddClass('show-modal')
                 .addAnimation([backdropAnimation, wrapperAnimation]);
-        }
+        };
 
         // pour l'animation de retour, on joue simplement l'inverse de l'animation d'entrée
         const leaveAnimation = (baseEl: any) => {
             return enterAnimation(baseEl).direction('reverse');
-        }
+        };
 
         // Création du modal avec les animations et les css défini
         const modal = await this.modalController.create({

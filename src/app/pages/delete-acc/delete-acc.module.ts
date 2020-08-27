@@ -1,20 +1,21 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
-import { IonicModule } from '@ionic/angular';
+import {IonicModule} from '@ionic/angular';
 
-import { DeleteAccPageRoutingModule } from './delete-acc-routing.module';
+import {DeleteAccPageRoutingModule} from './delete-acc-routing.module';
 
-import { DeleteAccPage } from './delete-acc.page';
+import {DeleteAccPage} from './delete-acc.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    DeleteAccPageRoutingModule
-  ],
-  declarations: [DeleteAccPage]
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        DeleteAccPageRoutingModule
+    ],
+    declarations: [DeleteAccPage]
 })
-export class DeleteAccPageModule {}
+export class DeleteAccPageModule {
+}

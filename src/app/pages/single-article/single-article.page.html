@@ -10,13 +10,13 @@
 
 <ion-content class="ion-padding">
     <ion-item>
-        <ion-thumbnail slot="start"
-                       *ngIf="orderLine.article.articleImage != undefined && orderLine.article.articleImage.image != undefined; else emptyImage ">
-            <img src="{{orderLine.article.articleImage.image}}"/>
+        <ion-thumbnail *ngIf="orderLine.article.articleImage != undefined && orderLine.article.articleImage.image != undefined; else emptyImage "
+                       slot="start">
+            <img src="{{orderLine.article.articleImage.image}}" alt="article picture"/>
         </ion-thumbnail>
         <ng-template #emptyImage>
             <ion-thumbnail>
-                <img src="./assets/icon/not_found.jpg"/>
+                <img src="assets/icon/not_found.jpg" alt="not found"/>
             </ion-thumbnail>
         </ng-template>
         <span><strong>{{orderLine.article.label}}</strong></span>
@@ -32,8 +32,8 @@
         <ion-label>Selectionnez la quantité souhaitée</ion-label>
         <ion-select
                 (ionChange)="onChange($event, orderLine)"
-                placeholder="{{orderLine.quantity}}"
                 interface="popover"
+                placeholder="{{orderLine.quantity}}"
                 value="{{orderLine.quantity}}">
             <ion-item *ngFor="let chiffre of possibleQuantities">
                 <ion-select-option value="{{chiffre}}">
@@ -43,7 +43,7 @@
         </ion-select>
     </ion-item>
     <!-- Ajout de la fonction qui change l'opacité a réaliser-->
-    <ion-button color="danger" (click)="onReset(orderLine)" [ngStyle]="{'opacity': isEmpty === true ? '20' : '100' }">
+    <ion-button (click)="onReset(orderLine)" [ngStyle]="{'opacity': isEmpty === true ? '20' : '100' }" color="danger">
         Réinitialiser
     </ion-button>
 </ion-content>

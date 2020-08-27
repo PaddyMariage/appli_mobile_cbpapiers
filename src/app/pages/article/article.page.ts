@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {LoadingController, ModalController} from '@ionic/angular';
 import {SingleArticlePage} from '../single-article/single-article.page';
 import {OrderLine} from 'src/app/models/OrderLine';
@@ -8,13 +8,14 @@ import {ArticleService} from '../../services/article.service';
 import {Order} from "../../models/Order";
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
 import {Storage} from "@ionic/storage";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'app-articles',
     templateUrl: './article.page.html',
     styleUrls: ['./article.page.scss'],
 })
-export class ArticlePage implements OnInit {
+export class ArticlePage implements OnInit, OnDestroy {
 
     possibleQuantities: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
     cart: Order;
@@ -22,32 +23,38 @@ export class ArticlePage implements OnInit {
     orderLineBackup: OrderLine[] = [];
     totalQuantity: number;
     customer: F_COMPTET;
+    cartSub: Subscription;
+    orderLineSub: Subscription;
+    activeCustomerSub: Subscription;
+    error: string = '';
+    errorBol: boolean;
     loading: HTMLIonLoadingElement;
+
 
     constructor(private modalController: ModalController,
                 private cartService: CartService,
                 private userService: UserService,
                 private articleService: ArticleService,
-                private storage : Storage,
+                private storage: Storage,
                 private loadingController: LoadingController) {
     }
 
     ngOnInit(): void {
-        this.cartService.cart$.subscribe(data => {
+        this.cartSub = this.cartService.cart$.subscribe(data => {
             this.cart = data;
             this.totalQuantity = data.orderLines.length;
         });
 
-        this.cartService.orderLineList$.subscribe(
+        this.orderLineSub = this.cartService.orderLineList$.subscribe(
             (liste) => {
                 this.orderLineList = liste;
             }
         );
 
-        this.userService.activeCustomer$.subscribe(
+        this.activeCustomerSub = this.userService.activeCustomer$.subscribe(
             customer => {
                 // on ne refresh pas si c'est déjà celui présent dans la page
-                if(this.customer == null || this.customer.CT_Num != customer.CT_Num) {
+                if (this.customer == null || this.customer.CT_Num != customer.CT_Num) {
                     this.orderLineList = [];
                     this.customer = customer;
                     this.initTopF_ARTICLE();
@@ -58,6 +65,7 @@ export class ArticlePage implements OnInit {
         this.presentLoading();
     }
 
+    // fait pop une fenêtre avec un message d'attente pendant le chargement de la liste
     async presentLoading() {
         this.loading = await this.loadingController.create({
             spinner: 'lines',
@@ -67,43 +75,16 @@ export class ArticlePage implements OnInit {
         await this.loading.present();
     }
 
+    // ferme cette fenêtre
     dismissLoading() {
         this.loadingController.dismiss(this);
     }
 
-    private async initTopF_ARTICLE() {
-        await this.articleService.getDocLignes(this.customer.CT_Num).then(
-            (orderLines: OrderLine[]) => this.orderLineList = orderLines)
-            .catch(error => console.log(error))
-            .finally(() => {
-                console.log(this.orderLineList);
-                this.initAllInfos(this.orderLineList)
-            });
+    doRefresh() {
+        this.presentLoading();
+        this.initTopF_ARTICLE();
     }
 
-    private async initAllInfos(orderLineList: OrderLine[]) {
-        console.log('in initAllInfos()');
-        await this.articleService.getArtClients(orderLineList, this.customer.CT_Num).then(
-            (orderLineList_Updated: OrderLine[]) => this.orderLineList = orderLineList_Updated
-        ).finally(() => {
-            this.initAllPrices(this.orderLineList);
-        });
-
-    }
-
-    private async initAllPrices(orderLineList: OrderLine[]) {
-        console.log('in initAllPrices()');
-        await this.articleService.getF_ARTICLE(orderLineList).then(
-            (orderLineList_Final: OrderLine[]) => this.orderLineList = orderLineList_Final
-        ).finally(() => {
-            console.log(this.orderLineList);
-            this.cartService.initOrderLinesList(this.orderLineList);
-            this.dismissLoading();
-        });
-    }
-
-
-    // retourne un backup d'orderLineList générée en initialisation de page.
     // l'intérêt est d'avoir une liste clean en backup qu'on envoie à la fonction filtre
     getOrderLines() {
         return this.orderLineBackup;
@@ -128,7 +109,10 @@ export class ArticlePage implements OnInit {
         }
 
         // on l'envoie à l'observable pour que la page se mette à jour
-        this.cartService.setOrderLineList(orderLines);
+        // la raison pour laquelle la quantité ne revient pas à 0 est probablement dûe
+        // au fait que le select est initialité à la création de la page
+        // et modifié seulement si ionChange est appelé dans le template
+        this.cartService.filterOrderLineList(orderLines);
     }
 
     async createOrderLineDetails(orderLine: OrderLine) {
@@ -174,6 +158,61 @@ export class ArticlePage implements OnInit {
 
         // on met à jour le nouveau panier dans le service
         this.cartService.setCart(this.cart);
+    }
+
+    ngOnDestroy() {
+        this.cartSub.unsubscribe();
+        this.orderLineSub.unsubscribe();
+        this.activeCustomerSub.unsubscribe();
+    }
+
+    private initTopF_ARTICLE() {
+        this.articleService.getDocLignes(this.customer.CT_Num)
+            .then((orderLines: OrderLine[]) => {
+                    this.cartService.initOrderLinesList(orderLines);
+                    this.error = '';
+                    this.errorBol = false;
+                    this.initAllInfos(orderLines);
+                }
+            )
+            .catch(error => {
+                this.dismissLoading();
+                this.error = error;
+                this.errorBol = true;
+            });
+    }
+
+    // Dés qu'une quantité est selectionnée pour un article, la méthode met à jour le panier et envoie l'information au cartservice
+
+    private initAllInfos(orderLineList: OrderLine[]) {
+        this.articleService.getArtClients(orderLineList, this.customer.CT_Num)
+            .then((orderLineList_Updated: OrderLine[]) => {
+                this.orderLineList = orderLineList_Updated;
+                this.initAllPrices(this.orderLineList);
+                this.errorBol = false;
+                this.error = '';
+            })
+            .catch(error => {
+                this.dismissLoading();
+                this.error = error;
+                this.errorBol = true;
+            });
+    }
+
+    private initAllPrices(orderLineList: OrderLine[]) {
+        this.articleService.getF_ARTICLE(orderLineList)
+            .then((orderLineList_Final: OrderLine[]) => {
+                this.orderLineList = orderLineList_Final;
+                this.orderLineBackup = this.orderLineList;
+                this.error = '';
+                this.errorBol = false;
+                this.dismissLoading();
+            })
+            .catch(error => {
+                this.error = error;
+                this.errorBol = true;
+                this.dismissLoading();
+            });
     }
 }
 
