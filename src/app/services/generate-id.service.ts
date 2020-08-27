@@ -31,15 +31,15 @@ export class GenerateIDService {
 
     // format de génération du numéro de commande : MOBI- suivi de 4 chiffres générées aléatoirement
     private generator(): string {
-        return 'MOBI-' + `${this.S4()}`;
+        return 'MOBI-' + `${this.S5()}`;
     }
 
     private idExists(id: string): boolean {
         return this.ids.includes(id);
     }
 
-    private S4(): number {
+    private S5(): number {
         // tslint:disable-next-line:no-bitwise
-        return (((1 + Math.random()) * 0x1000) | 0);
+        return (((1 + Math.random()) * 0x10000) | 0);
     }
 }
