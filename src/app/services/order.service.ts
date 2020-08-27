@@ -64,6 +64,7 @@ export class OrderService {
         this.ordersActive.push(order);
         if (this.ordersActive.length > 20)
             this.ordersActive.splice(this.ordersActive.length, 1);
+        this.ordersActive.sort((a, b) => (new Date(b.orderDate).valueOf() - new Date(a.orderDate).valueOf()));
         this.ordersActive$.next(this.ordersActive);
         this.dataStorage.set('orders' + this.userService.getActiveCustomer().CT_Num, JSON.stringify(this.ordersActive))
     }
@@ -80,6 +81,7 @@ export class OrderService {
                 index++;
         }
         this.dataStorage.set('orders' + this.userService.getActiveCustomer().CT_Num, this.ordersActive);
+        this.ordersActive.sort((a, b) => (new Date(b.orderDate).valueOf() - new Date(a.orderDate).valueOf()));
         this.order$.next(order);
         this.ordersActive$.next(this.ordersActive);
     }
