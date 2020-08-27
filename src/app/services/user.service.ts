@@ -86,7 +86,6 @@ export class UserService {
                 this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
                     .then(F_COMPTET => {
                         const data: F_COMPTET = JSON.parse(F_COMPTET.data);
-                        console.log(data);
                         // je verifie si le ct num est bon puis soit c'est un admin soit le password est bon
                         if (data.CT_Num.toLowerCase() == login.toLowerCase() && data.MDP.toLowerCase() == password.toLowerCase()) {
                             this.activeCustomer$.next(data);
@@ -110,6 +109,8 @@ export class UserService {
             while (!admin && index < this.customerAccounts.length) {
                 if (this.customerAccounts[index].CT_Num == 'CBPAP')
                     admin = true;
+                else
+                    index++;
             }
         return admin;
     }
@@ -134,6 +135,7 @@ export class UserService {
     }
 
     removeUserArrayStorage(user: F_COMPTET) {
+        console.log('remove user array storage');
         let index = 0;
         let found = false;
         if (this.customer.CT_Num == user.CT_Num) {
@@ -142,11 +144,13 @@ export class UserService {
             this.dataStorage.remove('activeUser');
         }
 
+        console.log(this.customerAccounts.length);
         while (!found && index < this.customerAccounts.length)
             if (this.customerAccounts[index].CT_Num == user.CT_Num)
                 found = true;
             else
                 index++;
+
         this.customerAccounts.splice(index, 1);
         this.customerAccounts$.next(this.customerAccounts);
 

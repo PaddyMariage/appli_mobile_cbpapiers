@@ -63,7 +63,6 @@ export class HeaderComponent implements OnInit {
     // permet d'avancer vers une route selectionné. L'avantage c'est que cela créer une animation
     // adéquate (fondu "avant" ou "arrière" d'un back button). Une des nombreuses manière de naviguer
     async goToSettings() {
-        console.log(this.userService.getCustomerAccounts());
         this.navCtrl.navigateForward('acc-choice');
     }
 

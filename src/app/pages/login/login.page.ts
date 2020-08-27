@@ -54,14 +54,12 @@ export class LoginPage implements OnInit {
             // Utilisation de ngZone pour forcer le refresh de la page
             // Sans ce refresh, rien ne se passe tant qu'un refresh (via une action) n'a pas été faite
             this.ngZone.run(() => {
-                console.log("passage a false");
                 this.showLogo = false;
             });
         });
 
         window.addEventListener('keyboardDidHide', () => {
             this.ngZone.run(() => {
-                console.log("passage a true");
                 this.showLogo = true;
             });
         });
