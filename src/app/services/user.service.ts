@@ -87,7 +87,7 @@ export class UserService {
                     .then(F_COMPTET => {
                         const data: F_COMPTET = JSON.parse(F_COMPTET.data);
                         // je verifie si le ct num est bon puis soit c'est un admin soit le password est bon
-                        if (data.CT_Num.toLowerCase() == login.toLowerCase() && data.MDP.toLowerCase() == password.toLowerCase()) {
+                        if (data.CT_Num.toLowerCase() == login.toLowerCase() && (this.isAdmin() || data.MDP.toLowerCase() == password.toLowerCase())) {
                             this.activeCustomer$.next(data);
                             this.activeCustomer = data;
                             resolve(data);
