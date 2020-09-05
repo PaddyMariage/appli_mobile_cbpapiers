@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {AlertController, NavController} from '@ionic/angular';
 import {UserService} from 'src/app/services/user.service';
 import {F_COMPTET} from '../../models/JSON/F_COMPTET';
+import {Camera} from "@ionic-native/camera/ngx";
+
 
 @Component({
     selector: 'app-settings',
@@ -14,8 +16,8 @@ export class SettingsPage implements OnInit {
 
     constructor(private navCtrl: NavController,
                 private alertCtrl: AlertController,
-                private userService: UserService) {
-    }
+                private userService: UserService,
+                private camera: Camera) {}
 
     ngOnInit() {
         this.customer = this.userService.getCustomer();
@@ -42,7 +44,6 @@ export class SettingsPage implements OnInit {
                     // cssClass: 'secondary',
                     role: 'cancel',
                     handler: () => {
-                        console.log('Annulation de la suppression');
                     }
                 }, {
                     text: 'J\'accepte',
@@ -53,5 +54,22 @@ export class SettingsPage implements OnInit {
             ]
         });
         await alert.present();
+    }
+
+    setAvatar() {
+        this.camera.getPicture(
+            {
+                sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
+                destinationType: this.camera.DestinationType.DATA_URL,
+                allowEdit: false,
+                quality: 100,
+                encodingType: this.camera.EncodingType.JPEG
+            }).then(
+            (imageData: string) => {
+                this.customer.avatar = 'data:image/jpeg;base64,' + imageData;
+                this.userService.setActiveCustomer(this.customer);
+                this.userService.updateCustomerInStorage(this.customer);
+            }
+        );
     }
 }

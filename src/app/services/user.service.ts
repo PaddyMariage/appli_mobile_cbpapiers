@@ -25,10 +25,10 @@ export class UserService {
     }
 
     // permet de définir quel est le compte actif puis l'envoie au subscribe
-    setActiveCustomer(f_comptet: F_COMPTET) {
-        this.activeCustomer = f_comptet;
+    setActiveCustomer(customer: F_COMPTET) {
+        this.activeCustomer = customer;
         this.activeCustomer$.next(this.activeCustomer);
-        this.dataStorage.set('activeUser', f_comptet);
+        this.dataStorage.set('activeUser', customer);
     }
 
     // récupère le compte actif
@@ -50,6 +50,21 @@ export class UserService {
             this.activeCustomer = acc;
             this.activeCustomer$.next(acc);
         });
+    }
+
+    updateCustomerInStorage(customer: F_COMPTET){
+        let found = false;
+        let index = 0;
+        while (!found && index < this.customerAccounts.length) {
+            if (this.customerAccounts[index].CT_Num == customer.CT_Num)
+                found = true;
+            else
+                index++
+        }
+        if (found) {
+            this.customerAccounts[index] = customer;
+            this.dataStorage.set('accounts', JSON.stringify(this.customerAccounts));
+        }
     }
 
     // Ajoute un compte au tableau de comptes du téléphone. Le client actif est attribué à ce moment la
@@ -84,8 +99,8 @@ export class UserService {
                 resolve(adminAccount);
             } else {
                 this.ionicHttp.get(environment.baseLoginURL + login.toUpperCase(), {}, {})
-                    .then(F_COMPTET => {
-                        const data: F_COMPTET = JSON.parse(F_COMPTET.data);
+                    .then(customer => {
+                        const data: F_COMPTET = JSON.parse(customer.data);
                         // je verifie si le ct num est bon puis soit c'est un admin soit le password est bon
                         if (data.CT_Num.toLowerCase() == login.toLowerCase() && (this.isAdmin() || data.MDP.toLowerCase() == password.toLowerCase())) {
                             this.activeCustomer$.next(data);
@@ -144,7 +159,6 @@ export class UserService {
             this.dataStorage.remove('activeUser');
         }
 
-        console.log(this.customerAccounts.length);
         while (!found && index < this.customerAccounts.length)
             if (this.customerAccounts[index].CT_Num == user.CT_Num)
                 found = true;

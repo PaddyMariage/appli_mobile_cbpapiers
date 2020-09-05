@@ -10,4 +10,5 @@ export class F_COMPTET {
     CT_EMail: string;
     CT_Sommeil: number;
     MDP?:string;
+    avatar?:string;
 }

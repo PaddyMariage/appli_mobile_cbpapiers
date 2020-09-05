@@ -15,18 +15,16 @@
 </ion-header>
 
 <ion-content>
-    <ion-title>Selection du compte</ion-title>
+    <ion-title>Profil de {{customer.CT_Intitule}}</ion-title>
     <ion-grid>
         <ion-row>
-            <ion-col [size]="12">
-                <div>
-                    <!--
-                    <ion-avatar>
-                        <ion-img class="image" src="{{customer.customerPicture}}" alt="avatar"></ion-img>
-                    </ion-avatar>
-                    -->
-                </div>
-            </ion-col>
+            <ion-avatar (click)="setAvatar()">
+                <ng-container *ngIf="customer.avatar != undefined; else emptyImage">
+                    <img class="image" [src]="customer.avatar" alt="avatar">
+                </ng-container>
+                <ng-template #emptyImage><img src="assets/icon/logo-default.png" alt="not found"/></ng-template>
+            </ion-avatar>
+            <ion-button (click)="setAvatar()">Changer ma photo de profil</ion-button>
         </ion-row>
         <ion-row>
             <ion-col>

@@ -3,6 +3,9 @@ import {OrderLine} from '../models/OrderLine';
 import {BehaviorSubject} from 'rxjs';
 import {WarehouseRetService} from './warehouse-ret.service';
 import {Order} from '../models/Order';
+import {F_COMPTET} from "../models/JSON/F_COMPTET";
+import {Storage} from "@ionic/storage";
+import {StorageOrderLines} from "../models/custom/StorageOrderLines";
 
 @Injectable({
     providedIn: 'root'
@@ -20,7 +23,7 @@ export class CartService {
     private total: number;
 
     // transfère le montant total du cart (utilisé dans la modal ValidationCom)
-    constructor(private warehouseRet: WarehouseRetService) {
+    constructor(private warehouseRet: WarehouseRetService, private storage: Storage) {
 
         this.initCart = {
             orderNumber: null,
@@ -73,19 +76,6 @@ export class CartService {
         const index = this.orderLineList.indexOf(orderLine);
         this.orderLineList[index].quantity = qty;
         this.orderLineList$.next(this.orderLineList);
-
-        // const index2 = this.cart.orderLines.indexOf(orderLine);
-        // console.log('index à supprimer');
-        // console.log(this.cart.orderLines.indexOf(orderLine));
-        //
-        // console.log('quantité à supprimer');
-        // console.log(this.cart.orderLines[index2].quantity);
-        //
-        // if(this.cart.orderLines[index2].quantity === 0){
-        //     console.log(this.cart.orderLines[index2]);
-        //     this.cart.orderLines.splice(index2,1);
-        //     // this.cart$.next(this.cart);
-        // }
     }
 
     // mise à jour des quantités dans la liste des articles : prend toutes les orderlines du panier en paramètre
@@ -107,6 +97,7 @@ export class CartService {
     filterOrderLineList(orderLinesFiltered: OrderLine[]) {
         this.orderLineList$.next(orderLinesFiltered);
     }
+
     // remise à 0 des quantités dans la liste d'article
     resetQuantityOfOrderLineList() {
         this.orderLineList.forEach(orderLine => orderLine.quantity = 0);
@@ -148,6 +139,21 @@ export class CartService {
             this.cart.orderLines.forEach(value => this.total += (value.article.unitPrice * value.quantity));
         } else {
             this.cart.orderLines.forEach(value => this.total += ((value.article.unitPrice * value.quantity) * 0.95));
+        }
+    }
+
+    public initActiveCustomerList(customer: F_COMPTET): boolean {
+        if (customer != null) {
+            this.storage.get(customer.CT_Num + 'list').then(
+                (storageOrderLines: StorageOrderLines) => {
+                    if (storageOrderLines.orderLines != null || storageOrderLines.orderLines != []) {
+                        this.orderLineList = storageOrderLines.orderLines;
+                        this.orderLineList$.next(storageOrderLines.orderLines);
+                    }
+                });
+            return true;
+        } else {
+            return false;
         }
     }
 }

@@ -8,7 +8,9 @@ import {F_ARTCLIENT} from '../models/JSON/F_ARTCLIENT';
 
 import {environment} from "../../environments/environment";
 import {OrderLine} from "../models/OrderLine";
-import {ArticleFrequency} from "../models/JSON/custom/ArticleFrequency";
+import {ArticleFrequency} from "../models/custom/ArticleFrequency";
+import {Storage} from "@ionic/storage";
+import {StorageOrderLines} from "../models/custom/StorageOrderLines";
 
 @Injectable({
     providedIn: 'root'
@@ -17,7 +19,7 @@ export class ArticleService {
 
     private article: Article;
 
-    constructor(private http: HttpClient, private ionicHttp: HTTP) {
+    constructor(private http: HttpClient, private ionicHttp: HTTP, private storage: Storage) {
     }
 
     setArticle(article: Article) {
@@ -105,7 +107,6 @@ export class ArticleService {
                             orderLines.push(orderLine);
                         }
                     );
-
                     // on renvoie cette liste à la page.
                     resolve(orderLines);
                 })
@@ -162,7 +163,8 @@ export class ArticleService {
 
     /**
      *
-     * @param orderLineList
+     * @param orderLineList -> the almost completed orderLineList of the customer
+     * @param CT_Num -> the id of the customer
      *
      * récupère tous les articles de la BDD et règle le prix des articles en fonction de ces 4 situations:
      *
@@ -178,7 +180,7 @@ export class ArticleService {
      * On récupère aussi les libellés des articles.
      **/
 
-    getF_ARTICLE(orderLineList: OrderLine[]) {
+    getF_ARTICLE(orderLineList: OrderLine[], CT_Num: string) {
 
         // on crée une liste "finale" afin de trier les articles dont le prix ne sera pas calculé
         // car la requête au webservice peut ne pas retourner certains articles suite à un filtre effectué
@@ -229,6 +231,15 @@ export class ArticleService {
                             }
                         }
                     }
+
+                    // j'enregistre la liste d'articles du client
+                    // (pour qu'elle soit retrouvée plus rapidement au prochain lancement)
+                    const storageOrderLines: StorageOrderLines = {
+                        orderLines: orderLineList_Final,
+                        date: new Date()
+                    }
+                    this.storage.set(CT_Num+'list', storageOrderLines);
+
                     // on retourne la liste "finale"
                     resolve(orderLineList_Final);
                 })

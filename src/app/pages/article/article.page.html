@@ -1,9 +1,8 @@
 <app-header></app-header>
 <ion-content>
-    <!--Debounce permet d'attendre un certain temps avant le dernier input pour pas faire 458 requêtes
-    $event sert à récolter les inputs et a les envoyer dans un objet de type DOM event (https://angular.io/guide/user-input)-->
     <ion-searchbar (ionChange)="getArticleSearched($event)" animated class="searchbar"
                    debounce="500" placeholder="Rechercher..." showCancelButton="focus"></ion-searchbar>
+
     <div *ngIf="errorBol" class="red">{{error}}
         <ion-button (click)="doRefresh()"
                     color="warning"
@@ -23,7 +22,7 @@
                 <span *ngIf="orderLine.article.articleImage != undefined && orderLine.article.articleImage.image != undefined; else emptyImage ">
                     <img src="{{orderLine.article.articleImage.image}}" alt="article picture"/>
                 </span>
-                <ng-template #emptyImage><img src="assets/icon/not_found.jpg" alt="not found"/></ng-template>
+                <ng-template #emptyImage><img src="assets/icon/logo-default.png" alt="not found"/></ng-template>
             </ion-thumbnail>
             <button (click)=createOrderLineDetails(orderLine)>
                 <ion-label><small>{{orderLine.article.reference}}</small></ion-label>

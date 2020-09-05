@@ -9,6 +9,7 @@ import {Order} from "../../models/Order";
 import {F_COMPTET} from "../../models/JSON/F_COMPTET";
 import {Storage} from "@ionic/storage";
 import {Subscription} from "rxjs";
+import {StorageOrderLines} from "../../models/custom/StorageOrderLines";
 
 @Component({
     selector: 'app-articles',
@@ -40,6 +41,7 @@ export class ArticlePage implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+
         this.cartSub = this.cartService.cart$.subscribe(data => {
             this.cart = data;
             this.totalQuantity = data.orderLines.length;
@@ -55,14 +57,38 @@ export class ArticlePage implements OnInit, OnDestroy {
             customer => {
                 // on ne refresh pas si c'est déjà celui présent dans la page
                 if (this.customer == null || this.customer.CT_Num != customer.CT_Num) {
-                    this.orderLineList = [];
                     this.customer = customer;
-                    this.initTopF_ARTICLE();
+                    console.log(customer.avatar);
+
+                    // check si la liste d'articles du client existe
+                    this.storage.get(customer.CT_Num + 'list').then(
+                        (storageOrderLines: StorageOrderLines) => {
+                            if (storageOrderLines != null) {
+
+                                // si elle existe, on check si ça fait plus de 30j qu'elle a été enregistrée
+                                const now = new Date().getTime()
+                                const to = new Date(storageOrderLines.date.getTime() + (30 * 24 * 60 * 60 * 1000)).getTime();
+                                if (now > to) {
+
+                                    // si oui on recalcule
+                                    this.initTopF_ARTICLE();
+                                    this.presentLoading();
+                                } else {
+
+                                    //sinon, on l'affiche
+                                    this.cartService.initOrderLinesList(storageOrderLines.orderLines);
+                                    this.orderLineBackup = this.cartService.getOrderLineList();
+                                }
+                            // si elle n'existe pas, on crée la liste d'articles
+                            } else {
+                                this.initTopF_ARTICLE();
+                                this.presentLoading();
+                            }
+                        }
+                    );
                 }
             }
         );
-
-        this.presentLoading();
     }
 
     // fait pop une fenêtre avec un message d'attente pendant le chargement de la liste
@@ -200,7 +226,7 @@ export class ArticlePage implements OnInit, OnDestroy {
     }
 
     private initAllPrices(orderLineList: OrderLine[]) {
-        this.articleService.getF_ARTICLE(orderLineList)
+        this.articleService.getF_ARTICLE(orderLineList, this.customer.CT_Num)
             .then((orderLineList_Final: OrderLine[]) => {
                 this.orderLineList = orderLineList_Final;
                 this.orderLineBackup = this.orderLineList;

@@ -1,28 +1,34 @@
 <ion-header>
-  <ion-grid class="ion-no-padding" fixed> <!-- créer un quadrillage permettant de positionner des colonnes et des lignes -->
-    <ion-toolbar>
-      <ion-row > <!-- permet d'ajouter une ligne, enfant du grid et mere de ion-col-->
-        <ion-col size="4">
-          <ion-avatar>
-            <img class="image" src="assets/icon/devanturePizzaHut.png" alt="avatar" (click)="goToSettings()">
-          </ion-avatar>
-          <span class="smaller"><strong>{{customer.CT_Intitule}}</strong></span>
-        </ion-col>
-        <ion-col class="logo" size="3" >
-          <img src="assets/icon/logo.jpg" alt="logo">
-        </ion-col>
-        <ion-col size="0.8"></ion-col>
-        <ion-col size="3.7" (click)="createCart()">
-          <ion-button color="light">
-            <ion-icon class="icones" name="cart-outline" size="small"></ion-icon>
-          </ion-button>
-          <ion-badge color="success">{{cart.orderLines.length}}</ion-badge>
-          <br/>
-          <span class="green" [ngStyle]="{'font-size': total > 1000 ? 'small' : 'medium'}">{{total | number : '1.2-2'}}€</span>
-        </ion-col>
-      </ion-row>
-      <ion-row class="colonne">
-        <ion-col size="auto">
+    <ion-grid class="ion-no-padding" fixed>
+        <!-- créer un quadrillage permettant de positionner des colonnes et des lignes -->
+        <ion-toolbar>
+            <ion-row> <!-- permet d'ajouter une ligne, enfant du grid et mere de ion-col-->
+                <ion-col size="4">
+                    <ion-avatar (click)="goToSettings()" class="avatar">
+                        <ng-container *ngIf="customer.avatar != undefined; else emptyImage">
+                            <img class="image" [src]="customer.avatar" alt="avatar">
+                        </ng-container>
+                        <ng-template #emptyImage><img src="assets/icon/logo-default.png" alt="not found"/></ng-template>
+                    </ion-avatar>
+                    <span class="smaller"><strong>{{customer.CT_Intitule}}</strong></span>
+                </ion-col>
+                <ion-col class="logo" size="3">
+                    <img src="assets/icon/logo.jpg" alt="logo">
+                </ion-col>
+                <ion-col size="0.8"></ion-col>
+                <ion-col size="3.7" (click)="createCart()">
+                    <ion-button color="light">
+                        <ion-icon class="icones" name="cart-outline" size="small"></ion-icon>
+                    </ion-button>
+                    <ion-badge color="success">{{cart.orderLines.length}}</ion-badge>
+                    <br/>
+                    <span class="green"
+                          [ngStyle]="{'font-size': total > 1000 ? 'small' : 'medium'}">{{total | number : '1.2-2'}}
+                        €</span>
+                </ion-col>
+            </ion-row>
+            <ion-row class="colonne">
+                <ion-col size="auto">
           <span *ngIf="!WHRetrieval">
             <ion-icon name="subway-outline"></ion-icon>
             <span *ngIf="total-250 >= 0; else pasRemise" class="green">
@@ -32,21 +38,22 @@
               <span class="minColonne"><small><span class="green">{{250 - total | number: '1.2-2'}}</span>€ avant livraison gratuite</small></span>
             </ng-template>
           </span>
-        </ion-col>
-        <ion-col size="auto">
-          <ion-icon name="home-outline"></ion-icon>
-          <span class="green">-5%</span><small> retrait entrepôt</small>
-        </ion-col>
-      </ion-row>
-      <ion-row class="colonneMax">
-        <ion-col size="10"
-        ></ion-col>
-        <ion-col size="2">
-          <span><ion-toggle color="success" [ngModel]="WHRetrieval" (click)="toggle($event)"></ion-toggle></span>
-        </ion-col>
-      </ion-row>
-    </ion-toolbar>
-  </ion-grid>
+                </ion-col>
+                <ion-col size="auto">
+                    <ion-icon name="home-outline"></ion-icon>
+                    <span class="green">-5%</span><small> retrait entrepôt</small>
+                </ion-col>
+            </ion-row>
+            <ion-row class="colonneMax">
+                <ion-col size="10"
+                ></ion-col>
+                <ion-col size="2">
+                    <span><ion-toggle color="success" [ngModel]="WHRetrieval"
+                                      (click)="toggle($event)"></ion-toggle></span>
+                </ion-col>
+            </ion-row>
+        </ion-toolbar>
+    </ion-grid>
 </ion-header>
 
 <!--

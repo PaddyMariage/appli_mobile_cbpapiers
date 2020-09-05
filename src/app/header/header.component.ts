@@ -6,7 +6,6 @@ import {UserService} from '../services/user.service';
 import {WarehouseRetService} from '../services/warehouse-ret.service';
 import {CartService} from '../services/cart.service';
 import {Order} from '../models/Order';
-import { cloneDeep } from 'lodash';
 import {F_COMPTET} from "../models/JSON/F_COMPTET";
 
 @Component({
@@ -26,8 +25,7 @@ export class HeaderComponent implements OnInit {
                 private orderService: OrderService,
                 private cartService: CartService,
                 private userService: UserService,
-                private warehouseRetService: WarehouseRetService
-    ) {}
+                private warehouseRetService: WarehouseRetService) {}
 
     ngOnInit() {
         // on subscribe à toute nouvelles données du cart
@@ -37,10 +35,10 @@ export class HeaderComponent implements OnInit {
         });
 
         // on subscribe à tout nouveau changement du customer actif
-        this.userService.activeCustomer$.subscribe((data) => {
-            this.customer = data;
-            this.cart.customer = data;
-        });
+            this.userService.activeCustomer$.subscribe((data) => {
+                this.customer = data;
+                this.cart.customer = data;
+            });
 
         // on subscribe à tout nouveau changement du status du toogle
         this.warehouseRetService.toggle$.subscribe((status) => {

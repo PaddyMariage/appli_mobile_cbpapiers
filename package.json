@@ -21,7 +21,9 @@
     "@angular/router": "~9.1.6",
     "@ionic-native/app-preferences": "^5.28.0",
     "@ionic-native/call-number": "^5.28.0",
+    "@ionic-native/camera": "^5.28.0",
     "@ionic-native/core": "^5.28.0",
+    "@ionic-native/crop": "^5.28.0",
     "@ionic-native/email-composer": "^5.28.0",
     "@ionic-native/file": "^5.28.0",
     "@ionic-native/file-opener": "^5.28.0",
@@ -63,6 +65,8 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.12.54",
     "codelyzer": "^5.1.2",
+    "cordova-plugin-camera": "^4.1.0",
+    "cordova-plugin-crop": "^0.4.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
     "cordova-plugin-ionic-webview": "^4.2.1",
@@ -102,7 +106,11 @@
       },
       "cordova-plugin-file": {},
       "cordova-plugin-advanced-http": {},
-      "call-number": {}
+      "call-number": {},
+      "cordova-plugin-camera": {
+        "ANDROID_SUPPORT_V4_VERSION": "27.+"
+      },
+      "cordova-plugin-crop": {}
     },
     "platforms": [
       "android",
