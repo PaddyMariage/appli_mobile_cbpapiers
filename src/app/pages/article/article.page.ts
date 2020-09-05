@@ -58,7 +58,6 @@ export class ArticlePage implements OnInit, OnDestroy {
                 // on ne refresh pas si c'est déjà celui présent dans la page
                 if (this.customer == null || this.customer.CT_Num != customer.CT_Num) {
                     this.customer = customer;
-                    console.log(customer.avatar);
 
                     // check si la liste d'articles du client existe
                     this.storage.get(customer.CT_Num + 'list').then(
